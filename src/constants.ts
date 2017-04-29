@@ -29,3 +29,15 @@ export const TestName = {
   [TestType.StandingLongJump]: '立定跳远',
   [TestType.VitalCapacity]: '肺活量',
 }
+
+export type TestRecord = {
+  id: string,
+  student: {
+    name: string,
+    code: string,
+  },
+  test: {
+    value: number,
+    type: TestType
+  }
+}

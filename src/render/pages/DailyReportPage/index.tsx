@@ -6,6 +6,7 @@ import { State as RootState } from '../../store';
 import Calendar from '../../components/Calendar';
 import TestResult from '../../components/TestResult';
 import url = require('url');
+import actions from '../../actions';
 import {
   bindMethod,
 } from '../../../lib/utils';
@@ -54,7 +55,7 @@ class DailyReportPage extends React.Component<Props, State> {
           </div>
         </Title>
       </NavigationBar>
-      { isCalendarShow && <Calendar date={date}/>}
+      { isCalendarShow && <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>}
       <TestResult date={date}/>
     </div>;
   }

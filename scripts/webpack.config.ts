@@ -57,6 +57,7 @@ export default {
     }]
   },
   devtool: 'source-map',
+  target: 'electron-renderer',
   devServer: {
     hot: true,
     contentBase: path.join(root, 'dist'),

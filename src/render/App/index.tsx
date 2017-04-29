@@ -22,10 +22,10 @@ export default class App extends React.Component<Props, State> {
       <ConnectedRouter  history={history}>
         <div id="routes">
           <Route path="/" exact component={HomePage as any}/>
-          <Route path="/calendar" component={CalendarPage} />
-          <Route path="/search" component={SearchPage} />
+          <Route path="/calendar" component={CalendarPage as any} />
+          <Route path="/search" component={SearchPage as any} />
           <Route path="/daily" component={DailyReportPage as any} />
-          <Route path="/addStudent" component={AddStudentPage} />
+          <Route path="/addStudent" component={AddStudentPage as any} />
         </div>
       </ConnectedRouter >
     </Provider>;

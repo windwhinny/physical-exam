@@ -3,3 +3,26 @@
     opacity: 0.5;
   }
 }
+.calendar{
+  background: black;
+  font-size: 15px;
+  .calendar-header{
+    list-style: none;
+    color: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 0;
+    height: 75px;
+    line-height: 75px;
+  }
+
+  .canvas-wrapper{
+    height: 450px;
+  }
+
+  canvas{
+    color: white;
+    vertical-align: top;
+  }
+}
