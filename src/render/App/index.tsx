@@ -1,45 +1,33 @@
+// tslint:disable:no-any
 import React = require('react');
-import CalendarScroller from '../components/Calendar/Scroller';
-import SportsEvents from '../components/SportsEvents';
-import { bindMethod } from '../../lib/utils';
+import { Provider } from 'react-redux';
+import { Route } from 'react-router'
+import { ConnectedRouter } from 'react-router-redux'
+
+import AddStudentPage from '../pages/AddStudentPage';
+import HomePage from '../pages/HomePage';
+import SearchPage from '../pages/SearchPage';
+import DailyReportPage from '../pages/DailyReportPage';
+import CalendarPage from '../pages/CalendarPage';
+import store, { history } from '../store';
 
 require('./index.scss');
 
-type State = {
-  date: Date,
-};
-
-type Props = {
-
-}
+type State = { };
+type Props = { };
 
 export default class App extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      date: new Date(),
-    };
-
-    bindMethod(this, ['onSelectedDateChanged']);
-  }
-
-  onSelectedDateChanged(date: Date) {
-    this.setState({
-      date,
-    });
-  }
-
   render() {
-    const { date } = this.state;
-    return <div className="app">
-      <header>
-        <div className="date">{date.getFullYear()}年{date.getMonth()}月</div>
-      </header>
-      <CalendarScroller
-        date={date}
-        onSelectedDateChanged={this.onSelectedDateChanged}/>
-      <SportsEvents />
-    </div>;
+    return <Provider store={store}>
+      <ConnectedRouter  history={history}>
+        <div id="routes">
+          <Route path="/" exact component={HomePage as any}/>
+          <Route path="/calendar" component={CalendarPage} />
+          <Route path="/search" component={SearchPage} />
+          <Route path="/daily" component={DailyReportPage as any} />
+          <Route path="/addStudent" component={AddStudentPage} />
+        </div>
+      </ConnectedRouter >
+    </Provider>;
   }
 }

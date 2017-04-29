@@ -7,3 +7,8 @@ export function bindMethod<T>(self: T, keys: (keyof T)[]) {
     }
   });
 }
+
+// tslint:disable-next-line:no-any
+export function getReturnVal<T>(fn: (...args: any[]) => T): T {
+  return (false as true) && fn();
+}

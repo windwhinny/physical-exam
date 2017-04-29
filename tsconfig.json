@@ -3,6 +3,7 @@
   "include": [
     "config/**/*",
     "scripts/**/*",
-    "src/lib/**/*"
+    "src/lib/**/*",
+    "src/index.ts"
   ]
 }

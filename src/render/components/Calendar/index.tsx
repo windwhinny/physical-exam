@@ -2,7 +2,7 @@ import React = require('react');
 import DateCell, { DateData } from './DateCell';
 import { oneDay } from '../../../lib/date';
 import {
-  CalendarDataSet,
+  DataSetGetter,
   CommonCalendarProps,
 } from './types';
 
@@ -15,7 +15,7 @@ type State = {
 type Props = CommonCalendarProps;
 
 export {
-  CalendarDataSet,
+  DataSetGetter,
 }
 
 export default class Calendar extends React.Component<Props, State> {

@@ -14,8 +14,9 @@ function createWindow() {
     protocol: 'file:',
     slashes: true,
   }));
+
 }
 
 app.on('ready', () => createWindow());
 app.on('all-window-closed', () => app.quit());
-app.on('active', () => createWindow())
+app.on('active', () => createWindow());

@@ -102,7 +102,10 @@ export default class CalendarScroler extends React.Component<Props, State> {
           {dates.map(d => {
             return <div className={cx('date', {
               active: d.getTime() === this.state.current.getTime(),
-            })} key={d.getTime()}>
+            })} key={d.getTime()} onClick={() => {
+              const update = this.props.onSelectedDateChanged;
+              if (update) update(d);
+            }}>
               {d.getDate()}
             </div>;
           })}

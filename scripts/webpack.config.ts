@@ -1,7 +1,7 @@
 import webpack = require('webpack');
 import path = require('path');
 import config = require('config');
-
+import TSLoader = require('awesome-typescript-loader');
 const root = config.get('root') as string;
 const publicPath = 'http://localhost:8080/'
 export default {
@@ -12,14 +12,14 @@ export default {
   },
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['.ts', '.tsx', '.js', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.json'],
   },
   entry: {
     app: [
       'react-hot-loader/patch',
       'webpack-dev-server/client?http://localhost:8080',
       'webpack/hot/only-dev-server',
-      path.resolve(root, './src/render/renderer.tsx'),
+      path.resolve(root, './src/render/index.tsx'),
     ],
   },
   module: {
@@ -27,7 +27,7 @@ export default {
       test: /\.(tsx|ts)$/,
       loader: 'awesome-typescript-loader',
       options: {
-        configFileName: 'tsconfig.render.json'
+        configFileName: 'src/render/tsconfig.json'
       }
     }, {
       test: /\.(css|scss)$/,
@@ -66,5 +66,8 @@ export default {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
+    new TSLoader.TsConfigPathsPlugin({
+      configFileName: 'src/render/tsconfig.json',
+    })
   ],
 }
