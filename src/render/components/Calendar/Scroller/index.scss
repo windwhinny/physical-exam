@@ -1,7 +1,12 @@
 .calendar-scroller{
   position: relative;
   overflow: hidden;
-  height: 100px;
+  .canvas-wrapper {
+    height: 170px;
+    canvas{
+      width: 100%;
+    }
+  }
   .slide{
     width: 200%;
     position: absolute;

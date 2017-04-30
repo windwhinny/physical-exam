@@ -4,8 +4,7 @@
   }
 }
 .calendar{
-  background: black;
-  font-size: 15px;
+  font-size: 30px;
   .calendar-header{
     list-style: none;
     color: white;
@@ -22,6 +21,7 @@
   }
 
   canvas{
+    width: 100%;
     color: white;
     vertical-align: top;
   }

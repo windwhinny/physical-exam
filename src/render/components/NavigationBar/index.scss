@@ -1,0 +1,29 @@
+.navigation-bar{
+  height: 90px; 
+  line-height: 90px; 
+  vertical-align: middle;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  width: 100%;
+  font-size: 30px;
+  border-bottom: 0.5px solid #E5E5E5;
+  .arrow, .title, .action {
+    display: inline-block;
+    align-content: center;
+    padding: 0 30px;
+  }
+  .arrow{
+    color: #5393ff;
+  }
+  .title{
+    color: #333; 
+  }
+
+  &.fusion {
+    .arrow, .title, .action {
+      color: inherit;
+    }
+    border-color: transparent;
+  }
+}

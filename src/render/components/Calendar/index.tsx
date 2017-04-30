@@ -1,6 +1,7 @@
 import React = require('react');
 import {
   bindMethod,
+  throttle,
 } from '../../../lib/utils';
 import { oneDay } from '../../../lib/date';
 import {
@@ -8,29 +9,28 @@ import {
   CommonCalendarProps,
 } from './types';
 import {
-  isSomeDay
+  isSameDay
 } from '../../../lib/date';
 import CanvasRenderer, {
-  CanvasStyle,
-  DateData,
   getColor,
   Cell,
   Rect,
-} from './canvasRenderer';
+  DateData,
+} from './CanvasRenderer';
 
 require('./index.scss');
 
 type State = {
   dates: DateData[][],
   wrapperSize?: ClientRect,
-  ctx: CanvasRenderingContext2D | null,
-  style?: CanvasStyle,
   activeMonth: [number, number],
   offset: number,
   baseDate: Date,
+  renderer?: CanvasRenderer,
 }
 
 type Props = CommonCalendarProps;
+
 
 export {
   DataSetGetter,
@@ -47,11 +47,11 @@ export default class Calendar extends React.Component<Props, State> {
     this.state = {
       baseDate: date,
       offset: 0,
-      ctx: null,
       dates: [],
       activeMonth: [date.getFullYear(), date.getMonth()]
     }
 
+    this.resizeCallback = throttle(this.resizeCallback, 500);
     bindMethod(this, [
       'renderCanvas',
       'touchStart',
@@ -60,6 +60,7 @@ export default class Calendar extends React.Component<Props, State> {
       'generateDates',
       'setActiveMonth',
       'onCanvasClick',
+      'resizeCallback',
     ]);
   }
 
@@ -105,14 +106,27 @@ export default class Calendar extends React.Component<Props, State> {
     this.setState({
       wrapperSize: rect,
     });
+    window.addEventListener('resize', this.resizeCallback);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeCallback);
+  }
+
+  resizeCallback() {
+    this.forceUpdate();
+    const wrapper = this.refs.wrapper as HTMLDivElement;
+    const rect = wrapper.getBoundingClientRect();
+    this.setState({
+      wrapperSize: rect,
+      renderer: undefined,
+    });
   }
 
   getCanvasStyle() {
     const { wrapperSize } = this.state;
-    const width = wrapperSize ? wrapperSize.width : 0;
     const height = wrapperSize ? wrapperSize.height : 0;
     return {
-      width: `${width}px`,
       height: `${height}px`,
     }
   }
@@ -129,31 +143,33 @@ export default class Calendar extends React.Component<Props, State> {
     const canvas = this.refs.canvas as HTMLCanvasElement;
     const style = getComputedStyle(canvas);
     const ctx = canvas.getContext('2d');
-    this.setState({
-      ctx,
+    if (!ctx) return;
+    const renderer = new CanvasRenderer(ctx, {
       style: {
         fontFamily: style.fontFamily || '',
         fontSize: Number((style.fontSize || '').replace('px', '')),
         color: getColor(style.color || ''),
       },
     });
+    this.setState({
+      renderer,
+    });
   }
 
   renderCanvas() {
-    const { ctx, style, activeMonth, offset } = this.state;
+    const { renderer, activeMonth, offset } = this.state;
     const { date } = this.props;
     if (!this.refs.canvas) return;
-    if (!style || !ctx) {
+    if (!renderer) {
       this.initCanvas();
       return;
     };
-    const renderer = new CanvasRenderer(ctx, {
-      activeDate: date,
-      activeMonth,
-      style,
-      offset,
+    renderer.render({
       getDateSet: this.generateDates,
+      activeDate: date,
       setActiveMonth: this.setActiveMonth,
+      offset,
+      activeMonth,
     });
     this.cells = renderer.cells;
     this.cellSize = renderer.cellCSSSize;
@@ -184,9 +200,8 @@ export default class Calendar extends React.Component<Props, State> {
     this.lastTouchPoint = point;
   }
 
-  touchEnd(e: React.TouchEvent<HTMLDivElement>) {
+  touchEnd() {
     this.lastTouchPoint = null;
-    e;
   }
 
   onCanvasClick(e: React.MouseEvent<HTMLCanvasElement>) {
@@ -196,13 +211,12 @@ export default class Calendar extends React.Component<Props, State> {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    console.log(x, y)
     const cell = this.cells.find(c => {
       return Math.abs(x - c.x) < cellSize.width / 2 &&
              Math.abs(y - c.y) < cellSize.height / 2;
     });
     if (!cell) return;
-    if (isSomeDay(cell.date, this.props.date)) return;
+    if (isSameDay(cell.date, this.props.date)) return;
     if (this.props.onSelectedDateChanged) {
       this.props.onSelectedDateChanged(cell.date);
     }

@@ -10,6 +10,8 @@ import {
   bindMethod,
 } from '../../../lib/utils'
 
+require('./index.scss');
+
 type Props = RouteComponentProps<{}> & {
   date: Date,
 }
@@ -58,19 +60,21 @@ class CalendarPage extends React.Component<Props, State> {
     const { date } = this.props;
     const { history } = this.props;
     return <div className="calendar-page">
-      <NavigationBar onBack={history.goBack}>
-        <Title>
-          {this.renderMonth()}
-        </Title>
-        <Action>
-          <Link to="/search">搜索</Link>
-        </Action>
-      </NavigationBar>
-      <Calendar date={date}
-        onSelectedDateChanged={actions.updateSelectedDate}
-        onHoveredMonthChanged={this.updateMonth}
-        activeMonth={activeMonth}
-        />
+      <header>
+        <NavigationBar onBack={history.goBack} mode="fusion">
+          <Title>
+            {this.renderMonth()}
+          </Title>
+          <Action>
+            <Link to="/search">搜索</Link>
+          </Action>
+        </NavigationBar>
+        <Calendar date={date}
+          onSelectedDateChanged={actions.updateSelectedDate}
+          onHoveredMonthChanged={this.updateMonth}
+          activeMonth={activeMonth}
+          />
+      </header>
     </div>;
   }
 }
