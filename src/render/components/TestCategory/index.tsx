@@ -4,10 +4,11 @@ import url = require('url');
 import {
   TestName,
 } from '../../../constants';
+require('./index.scss');
 
 export default class TestCategory extends React.Component<{}, {}> {
   render() {
-    return <div className="TestCategory">
+    return <div className="test-category">
       {Object.keys(TestName).map((k) => {
         const name = TestName[Number(k)];
         const path = url.format({
@@ -16,7 +17,9 @@ export default class TestCategory extends React.Component<{}, {}> {
             item: k,
           },
         });
-        return <Link to={path} key={k}>{name}</Link>;
+        return <Link className="item" to={path} key={k}>
+          <span className="name">{name}</span>
+        </Link>;
       })}
     </div>;
   }

@@ -1,0 +1,21 @@
+.test-category{
+  display: flex;
+  flex-wrap: wrap;
+  .item{
+    width: 25%;
+    height: 200px;
+    border-left: 1px solid  #f4f4f4;
+    border-bottom: 1px solid  #f4f4f4;
+    position: relative;
+    display: block;
+    color: #333;
+    .name{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 20px;
+      display: block;
+      text-align: center;
+    }
+  }
+}

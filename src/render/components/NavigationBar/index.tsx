@@ -15,20 +15,26 @@ type Props = {
 export default class NavigationBar extends React.PureComponent<Props, void> {
   render() {
     let { children, mode } = this.props;
+    let haveAction = false;
     if (Array.isArray(children)) {
       children = children.filter(child => {
-        return isTypeofComponent(child, Title) || isTypeofComponent(child, Action);
+        const isAction = isTypeofComponent(child, Action);
+        if (isAction) haveAction = true;
+        return isTypeofComponent(child, Title) || isAction;
       });
     } else if (
       !isTypeofComponent(children, Title) &&
       !isTypeofComponent(children, Action)
     ) {
      children = null;
+    } else if (isTypeofComponent(children, Action)) {
+      haveAction = true;
     }
 
     return <div className={cx('navigation-bar', mode)}>
       <div className="arrow" onClick={this.props.onBack}>{'<'}</div>
       {children}
+      {haveAction ? null : <Action></Action>}
     </div>;
   }
 }
