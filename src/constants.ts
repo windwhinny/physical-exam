@@ -38,6 +38,10 @@ export enum TestType {
    * 实心球
    */
   MedicineBall,
+  /**
+   * 未知项目
+   */
+  Unknow,
 }
 
 export const TestName = {
@@ -70,8 +74,23 @@ export const TestUnitTemp = {
   [TestType.MedicineBall]: '$0 米',
 }
 
+export const TestCode = {
+  [TestType.Running50]: '50',
+  [TestType.Running80]: '8H',
+  [TestType.Running100]: '1K',
+  [TestType.RopeSkipping]: 'TS',
+  [TestType.Situps]: 'YW',
+  [TestType.StandingLongJump]: 'TY',
+  [TestType.VitalCapacity]: 'FH',
+  [TestType.SitAndReach]: 'QQ',
+  [TestType.PullUp]: 'YT',
+  [TestType.RunningBackAndForth]: '5W',
+  [TestType.HeightAndWeight]: 'ST',
+  [TestType.MedicineBall]: 'SX',
+}
+
 export type TestRecord = {
-  id: string,
+  id?: string,
   date: Date,
   student: {
     name: string,
@@ -81,4 +100,19 @@ export type TestRecord = {
     score: string,
     type: TestType
   }
+}
+
+export type Pagination = {
+  limit: number,
+  page: number,
+}
+
+export interface RecordService {
+  init(): Promise<void>;
+  getById(id: string): Promise<TestRecord>;
+  save(r: TestRecord): Promise<TestRecord>;
+  searchStudent(keyword: string): Promise<string[]>;
+  getByStudent(name: string, pagination: Pagination): Promise<TestRecord[]>;
+  getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
+  sync(): Promise<void>;
 }

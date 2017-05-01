@@ -1,14 +1,9 @@
 import {
   UPDATE_SELECTED_DATE,
-  updateSelectedDate,
+  updateSelectedDateAction,
 } from '../actions/selectedDate';
-import {
-  getReturnVal,
-} from '../../lib/utils';
 
-const updateAction = getReturnVal(updateSelectedDate);
-
-export default function(d: Date = new Date(), action: typeof updateAction) {
+export default function(d: Date = new Date(), action: updateSelectedDateAction) {
   switch (action.type) {
     case UPDATE_SELECTED_DATE:
       return action.date;

@@ -12,6 +12,10 @@ import {
   bindMethod,
 } from '../../../lib/utils';
 import {
+  TestRecord,
+  Pagination,
+} from '../../../constants';
+import {
   TestName,
 } from '../../../constants';
 require('./index.scss');
@@ -19,13 +23,15 @@ type Props = RouteComponentProps<{
   item: number,
 }> & {
   date: Date,
+  records: TestRecord[],
+  pagination: Pagination,
 };
 
 type State = {
   isCalendarShow: boolean,
 }
 
-class DailyReportPage extends React.Component<Props, State> {
+class DailyReportPage extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -36,6 +42,14 @@ class DailyReportPage extends React.Component<Props, State> {
     bindMethod(this, ['toggleCalendar']);
   }
 
+  componentWillReceiveProps(newProps: Props) {
+    if (newProps.date.getTime() !== this.props.date.getTime()) [
+      this.setState({
+        isCalendarShow: false,
+      })
+    ]
+  }
+
   toggleCalendar() {
     this.setState({
       isCalendarShow: !this.state.isCalendarShow,
@@ -43,10 +57,15 @@ class DailyReportPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { history, location, date } = this.props;
+    const {
+      history,
+      location,
+      date,
+      records,
+      pagination,
+    } = this.props;
     const { isCalendarShow } = this.state;
     const path = url.parse(location.search, true);
-
     return <div className="daily-report">
       <NavigationBar onBack={history.goBack}>
         <Title>
@@ -60,11 +79,13 @@ class DailyReportPage extends React.Component<Props, State> {
       <div className={cx('calendar-container', isCalendarShow && 'show')}>
         <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>
       </div>
-      <TestResult date={date}/>
+      <TestResult date={date} records={records} type={path.query.item} pagination={pagination}/>
     </div>;
   }
 }
 
 export default connect((state: RootState) => ({
   date: state.selectedDate,
+  records: state.dailyReportPage.records,
+  pagination: state.dailyReportPage.pagination,
 }))(DailyReportPage);

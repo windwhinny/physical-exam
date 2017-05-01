@@ -2,62 +2,43 @@ import React = require('react');
 import {
   TestRecord,
   TestType,
+  Pagination,
 } from '../../../constants';
 import TestResultItem from './Item';
 import {
   bindMethod,
 } from '../../../lib/utils';
+import actions from '../../actions';
 require('./index.scss');
+
 type Props = {
-  date: Date
-}
-
-type State = {
+  date: Date,
   records: TestRecord[],
-  fetching: boolean,
-  pagination: {
-    page: number,
-    isEnd: boolean,
-  },
+  type: TestType,
+  pagination: Pagination,
 }
 
-export default class TestRsult extends React.Component<Props, State> {
+export default class TestRsult extends React.PureComponent<Props, void> {
   constructor(props: Props) {
     super(props);
-
-    this.state = {
-      records: [{
-        id: 'asdfhuiqwefhiqf',
-        date: new Date(),
-        student: {
-          name: '张三',
-          nu: '1234567712312342947298',
-        },
-        test: {
-          type: TestType.HeightAndWeight,
-          score: '170, 40',
-        }
-      }],
-      fetching: false,
-      pagination: {
-        page: 0,
-        isEnd: false,
-      }
-    }
 
     bindMethod(this, ['onScroll'])
   }
 
-  componentDidMount() {
-    this.fetch();
+  componentWillReceiveProps(newProps: Props) {
+    if (newProps.date.getTime() !== this.props.date.getTime()) {
+      actions.DRPClear();
+      this.fetch(newProps.date);
+    }
   }
 
-  fetch() {
-    if (this.state.fetching) return;
+  componentDidMount() {
+    this.fetch(this.props.date);
+  }
 
-    this.setState({
-      fetching: true,
-    });
+  fetch(date: Date) {
+    const { type, pagination } = this.props;
+    actions.DRPloadRecords(date, type, pagination)
   }
 
   onScroll() {
@@ -66,14 +47,17 @@ export default class TestRsult extends React.Component<Props, State> {
     const top = container.scrollTop;
     const clientHeight = container.clientHeight;
     if (height - clientHeight - top < 100) {
-      this.fetch();
+      this.fetch(this.props.date);
     }
   }
 
   render() {
-    const { records } = this.state;
+    const { records } = this.props;
     return <div className="test-result" onScroll={this.onScroll} ref="container">
-      {records.map(r => <TestResultItem key={r.id} record={r}/>)}
+      {records.length ?
+        records.map(r => <TestResultItem key={r.id} record={r}/>) :
+        <div className="empty">暂无相关测试数据</div>
+      }
     </div>;
   }
 }

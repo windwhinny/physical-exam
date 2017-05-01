@@ -8,7 +8,7 @@ type Props = {
   record: TestRecord,
 }
 
-export default class TestResultItem extends React.Component<Props, void> {
+export default class TestResultItem extends React.PureComponent<Props, void> {
   getScoreDesc(record: TestRecord): string {
     const score = record.test.score;
     const temp = TestUnitTemp[record.test.type];
