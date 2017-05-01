@@ -1,11 +1,13 @@
 import React = require('react');
 import {
   TestRecord,
+  TestType,
 } from '../../../constants';
 import TestResultItem from './Item';
 import {
   bindMethod,
 } from '../../../lib/utils';
+require('./index.scss');
 type Props = {
   date: Date
 }
@@ -24,7 +26,18 @@ export default class TestRsult extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      records: [],
+      records: [{
+        id: 'asdfhuiqwefhiqf',
+        date: new Date(),
+        student: {
+          name: '张三',
+          nu: '1234567712312342947298',
+        },
+        test: {
+          type: TestType.HeightAndWeight,
+          score: '170, 40',
+        }
+      }],
       fetching: false,
       pagination: {
         page: 0,

@@ -3,6 +3,7 @@ import BaseCanvasRenderer, {
   DateData,
   getColor,
   Rect,
+  RenderOptions,
 } from './BaseCanvasRenderer';
 
 export type FrameOptions = {
@@ -25,10 +26,29 @@ export {
   DateData,
 }
 
+type ExtraStyle = {
+  highLight: {
+    color: Color,
+    backgroundColor: Color,
+  },
+  note: {
+    color: Color,
+  }
+}
+
 export default class CanvasRenderer extends BaseCanvasRenderer {
   cellSize: Rect;
   cellCSSSize: Rect;
-  cells: Cell[] = []
+  cells: Cell[] = [];
+  extraStyle: ExtraStyle;
+
+  constructor(
+    ctx: CanvasRenderingContext2D,
+    options: RenderOptions,
+    style: ExtraStyle) {
+    super(ctx, options);
+    this.extraStyle = style;
+  }
 
   render(frameOptions: FrameOptions) {
 
@@ -82,13 +102,21 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
         // 高亮今天日期
         if (year === td[0] && month === td[1] && date === td[2]) {
           this.drawCircle(x, y, Math.min(cellSize.height, cellSize.width) * 0.3, unactiveColor);
-          this.drawText(String(date), x, y, [83, 147, 255, 1]);
+          this.drawText(String(date), x, y, this.extraStyle.highLight.color);
         }
 
         // 高亮选中日期
         if (year === ad[0] && month === ad[1] && date === ad[2]) {
-          this.drawCircle(x, y, Math.min(cellSize.height, cellSize.width) * 0.3);
-          this.drawText(String(date), x, y, [83, 147, 255, 1]);
+          this.drawCircle(
+            x,
+            y,
+            Math.min(cellSize.height, cellSize.width) * 0.3,
+            this.extraStyle.highLight.backgroundColor);
+          this.drawText(
+            String(date),
+            x,
+            y,
+            this.extraStyle.highLight.color);
         }
 
         // 当下个月的 15 号移动到屏幕中央时，高亮

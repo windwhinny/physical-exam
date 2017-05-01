@@ -20,9 +20,16 @@
     height: 450px;
   }
 
+  .dates{
+    color: white;
+    .high-light{
+      background: white;
+      color: #5393ff;
+    }
+  }
+
   canvas{
     width: 100%;
-    color: white;
     vertical-align: top;
   }
 }

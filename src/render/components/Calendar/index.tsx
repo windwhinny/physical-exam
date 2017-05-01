@@ -140,8 +140,11 @@ export default class Calendar extends React.Component<Props, State> {
   }
 
   initCanvas() {
-    const canvas = this.refs.canvas as HTMLCanvasElement;
+    const dates = this.refs.dates as HTMLDivElement;
+    const canvas = dates.querySelector('canvas') as HTMLCanvasElement;
     const style = getComputedStyle(canvas);
+    const highLightStyle = getComputedStyle(dates.querySelector('.high-light') as Element);
+    const noteStyle = getComputedStyle(dates.querySelector('.note') as Element);
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const renderer = new CanvasRenderer(ctx, {
@@ -149,6 +152,14 @@ export default class Calendar extends React.Component<Props, State> {
         fontFamily: style.fontFamily || '',
         fontSize: Number((style.fontSize || '').replace('px', '')),
         color: getColor(style.color || ''),
+      },
+    },   {
+      highLight: {
+        color: getColor(highLightStyle.color || ''),
+        backgroundColor: getColor(highLightStyle.backgroundColor || ''),
+      },
+      note: {
+        color: getColor(noteStyle.color || ''),
       },
     });
     this.setState({
@@ -242,13 +253,17 @@ export default class Calendar extends React.Component<Props, State> {
       </ul>
       <div className="canvas-wrapper" ref="wrapper">
         { wrapperSize &&
-          <canvas
-            ref="canvas"
-            style={this.getCanvasStyle()}
-            width={size.width}
-            height={size.height}
-            onClick={this.onCanvasClick}
-          ></canvas> }
+          <div className="dates" ref="dates">
+            <canvas
+              ref="canvas"
+              style={this.getCanvasStyle()}
+              width={size.width}
+              height={size.height}
+              onClick={this.onCanvasClick}
+            ></canvas>
+            <span className="high-light"></span>
+            <span className="note"></span>
+          </div>}
       </div>
     </div>;
   }

@@ -1,13 +1,13 @@
 .navigation-bar{
   height: 90px; 
-  line-height: 90px; 
   vertical-align: middle;
   display: flex;
   justify-content: space-between;
   align-content: center;
+  align-items: center;
   width: 100%;
   font-size: 30px;
-  border-bottom: 0.5px solid #E5E5E5;
+  border-bottom: 1px solid #E5E5E5;
   .arrow, .title, .action {
     display: inline-block;
     align-content: center;

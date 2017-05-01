@@ -7,13 +7,14 @@ import Calendar from '../../components/Calendar';
 import TestResult from '../../components/TestResult';
 import url = require('url');
 import actions from '../../actions';
+import cx = require('classnames');
 import {
   bindMethod,
 } from '../../../lib/utils';
 import {
   TestName,
 } from '../../../constants';
-
+require('./index.scss');
 type Props = RouteComponentProps<{
   item: number,
 }> & {
@@ -55,7 +56,10 @@ class DailyReportPage extends React.Component<Props, State> {
           </div>
         </Title>
       </NavigationBar>
-      { isCalendarShow && <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>}
+      <div className={cx('mask', isCalendarShow && 'show')} onClick={this.toggleCalendar}></div>
+      <div className={cx('calendar-container', isCalendarShow && 'show')}>
+        <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>
+      </div>
       <TestResult date={date}/>
     </div>;
   }
