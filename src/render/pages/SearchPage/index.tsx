@@ -67,11 +67,13 @@ class SearchPage extends React.Component<Props, void> {
       <ul>
         {students.map(s => {
           return <li key={s.no}>
-            <div className="student">
-              <div className="name">{s.name}</div>
-              <div className="no">{s.no}</div>
-            </div>
-            <Link to={`/student?no=${s.no}&name=${s.name}`}>查看全部测试结果</Link>
+            <Link to={`/student?no=${s.no}&name=${s.name}`}>
+              <div className="student">
+                <div className="name">{s.name}</div>
+                <div className="no">{s.no}</div>
+              </div>
+            <span>查看全部测试结果</span>
+           </Link>
           </li>;
         })}
       </ul>

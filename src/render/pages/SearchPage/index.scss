@@ -58,6 +58,13 @@
       justify-content: space-between;
       align-items: center;
     }
+    a{
+      color: inherit;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex: 1;
+    }
     .student{
       .name{
         font-size: 30px;
@@ -66,7 +73,7 @@
         font-size: 20px;
       }
     }
-    a{
+    span{
       font-size: 18px;
       color: #a2a2a2;
     }

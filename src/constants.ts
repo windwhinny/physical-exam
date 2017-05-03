@@ -1,7 +1,7 @@
 export enum TestType {
   Running50,
-  Running80,
-  Running100,
+  Running800,
+  Running1000,
   /**
    * 往返跑步
    */
@@ -46,8 +46,8 @@ export enum TestType {
 
 export const TestName = {
   [TestType.Running50]: '50米跑',
-  [TestType.Running80]: '80米跑',
-  [TestType.Running100]: '100米跑',
+  [TestType.Running800]: '800米跑',
+  [TestType.Running1000]: '1000米跑',
   [TestType.RopeSkipping]: '跳绳',
   [TestType.Situps]: '仰卧起坐',
   [TestType.StandingLongJump]: '立定跳远',
@@ -61,8 +61,8 @@ export const TestName = {
 
 export const TestUnitTemp = {
   [TestType.Running50]: '$0 秒',
-  [TestType.Running80]: '$0 秒',
-  [TestType.Running100]: '$0 秒',
+  [TestType.Running800]: '$0 秒',
+  [TestType.Running1000]: '$0 秒',
   [TestType.RopeSkipping]: '$0 cm',
   [TestType.Situps]: '$0 次',
   [TestType.StandingLongJump]: '$0 cm',
@@ -76,8 +76,8 @@ export const TestUnitTemp = {
 
 export const TestCode = {
   [TestType.Running50]: '50',
-  [TestType.Running80]: '8H',
-  [TestType.Running100]: '1K',
+  [TestType.Running800]: '8H',
+  [TestType.Running1000]: '1K',
   [TestType.RopeSkipping]: 'TS',
   [TestType.Situps]: 'YW',
   [TestType.StandingLongJump]: 'TY',

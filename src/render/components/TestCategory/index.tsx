@@ -13,12 +13,12 @@ const icons = {
     <path fill="#BED4FF" d="M0,76.9h18.4L46,0h-6.9L0,76.9z M69.1,0h-6.9l29.4,77H110L69.1,0z"/>
     <text fill="#5393FF" x="35" y="110" >50</text>
   </svg>,
-  [TestType.Running80]: () => <svg  width="110" height="111" viewBox="0 0 110 111" >
+  [TestType.Running800]: () => <svg  width="110" height="111" viewBox="0 0 110 111" >
     <path fill="#5393FF" d="M55.9,3.7h-2.8l-1.8,10.2h6.4L55.9,3.7z M57.7,20.4h-6.4l-2.2,13.9h10.5L57.7,20.4z M60.7,44.5H48.4 L44,73.3h21L60.7,44.5z"/>
     <path fill="#BED4FF" d="M0,77h18.4L46,0h-6.9L0,77z M69,0h-6.9l29.4,77H110L69,0z"/>
     <text fill="#5393FF" y="110" x="30">800</text>
   </svg>,
-  [TestType.Running100]: () => <svg  width="110" height="111" viewBox="0 0 110 111" >
+  [TestType.Running1000]: () => <svg  width="110" height="111" viewBox="0 0 110 111" >
     <path fill="#5393FF" d="M55.9,3.7h-2.8l-1.8,10.2h6.4L55.9,3.7z M57.8,20.3h-6.4l-2.2,13.8h10.5L57.8,20.3z M60.7,44.4H48.4 L44,73.1h21L60.7,44.4z"/>
     <path fill="#BED4FF" d="M0,76.8h18.4L46,0h-6.9L0,76.8z M69.1,0h-6.9l29.4,76.8H110L69.1,0z"/>
     <text fill="#5393FF" y="110" x="25">1000</text>
