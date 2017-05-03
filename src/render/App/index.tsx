@@ -4,6 +4,7 @@ import { Route } from 'react-router'
 import { ConnectedRouter } from 'react-router-redux'
 
 import AddStudentPage from '../pages/AddStudentPage';
+import StudentPage from '../pages/StudentPage';
 import HomePage from '../pages/HomePage';
 import SearchPage from '../pages/SearchPage';
 import DailyReportPage from '../pages/DailyReportPage';
@@ -37,6 +38,7 @@ class App extends React.Component<Props, State> {
         <Route path="/" exact component={HomePage as any}/>
         <Route path="/calendar" component={CalendarPage as any} />
         <Route path="/search" component={SearchPage as any} />
+        <Route path="/student" component={StudentPage as any} />
         <Route path="/daily" component={DailyReportPage as any} />
         <Route path="/addStudent" component={AddStudentPage as any} />
       </div>

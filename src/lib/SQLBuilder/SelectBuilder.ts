@@ -8,7 +8,7 @@ import {
 
 export default class SelectBuilder extends BuilderBase {
   _offset: number | null = null;
-  distinctField: string | null = null;
+  distinctField: string[] | null = null;
 
   constructor(keys: string | string[] | SimpleObject) {
     super();
@@ -48,7 +48,7 @@ export default class SelectBuilder extends BuilderBase {
     this._tableName = tableName;
     return this;
   }
-  distinct(distinctField: string): this {
+  distinct(distinctField: string[]): this {
     this.distinctField = distinctField;
     return this;
   }
@@ -56,9 +56,12 @@ export default class SelectBuilder extends BuilderBase {
     this._offset = n;
     return this;
   }
-  private setDistinct(field: string, result: string[]) {
-    result.push('DISTINCT');
-    result.push(`\`${field}\``);
+  private setDistinct(field: string[], result: string[]) {
+    result.push('SELECT', 'DISTINCT');
+    const str = field.map(f => {
+      return `\`${f}\``;
+    }).join(', ');
+    result.push(str);
   }
   /**
    * 生成 SQL 语句

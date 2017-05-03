@@ -79,24 +79,30 @@ class RecordService implements RecordServiceInterface {
     return this.reverse(po);
   }
 
-  async searchStudent(keyword: string): Promise<string[]> {
+  async searchStudent(keyword: string): Promise<{name: string, no: string}[]> {
     const search = `%${keyword}%`;
     const r = await this.model.find({
       where: {
-        $or: {
+        $or: [{
           stuNo: {$lk: search},
+        }, {
           stuName: {$lk: search}
-        }
+        }]
       },
-      distinct: 'stuName',
-    }) as {stuName: string}[];
-    return r.map(_ => _.stuName);
+      limit: 10,
+      distinct: ['stuName', 'stuNo'],
+    }) as {stuName: string, stuNo: string}[];
+    return r.map(_ => ({
+      name: _.stuName,
+      no: _.stuNo
+    }));
   }
 
-  async getByStudent(name: string, pagination: Pagination): Promise<TestRecord[]> {
+  async getByStudentNo(no: string, type: TestType, pagination: Pagination): Promise<TestRecord[]> {
     const rs = await this.model.find({
       where: {
-        stuName: name,
+        stuNo: no,
+        item: TestCode[type],
       },
       limit: pagination.limit,
       offset: (pagination.page - 1) * pagination.limit,

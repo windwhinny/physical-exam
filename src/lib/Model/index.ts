@@ -119,7 +119,7 @@ export default class Model extends BaseModel {
       field: string,
       order: Order,
     },
-    distinct?: string,
+    distinct?: string[],
     attrs?: string[],
   }, t?: DBTransaction): Promise<SimpleObject[]> {
     options = options || {};

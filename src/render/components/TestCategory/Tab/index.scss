@@ -1,0 +1,17 @@
+.test-category-tab{
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  span{
+    border-bottom: 4px solid transparent;
+    font-size: 30px;
+    height: 70px;
+    display: inline-flex;
+    align-items: center;
+    margin: 0 50px;
+    &.active {
+      color: #5393ff;
+      border-color: #5393ff;
+    }
+  }
+}

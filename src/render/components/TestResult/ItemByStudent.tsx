@@ -8,15 +8,14 @@ type Props = {
   record: TestRecord,
 }
 
-export default class TestResultItem extends React.PureComponent<Props, void> {
+export default class TestResultItemByStudent extends React.PureComponent<Props, void> {
   render() {
     const { record } = this.props;
     return <div className="test-result-item">
-      <div className="student">
-        <div className="name">{record.student.name}</div>
-        <div className="code">{record.student.nu}</div>
-      </div>
       <Score record={record}/>
+      <div className="date">
+        {new Date(record.date).toLocaleDateString()}
+      </div>
     </div>;
   }
 }

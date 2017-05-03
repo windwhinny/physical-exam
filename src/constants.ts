@@ -3,6 +3,10 @@ export enum TestType {
   Running80,
   Running100,
   /**
+   * 往返跑步
+   */
+  RunningBackAndForth,
+  /**
    * 跳绳
    */
   RopeSkipping,
@@ -26,10 +30,6 @@ export enum TestType {
    * 引体向上
    */
   PullUp,
-  /**
-   * 往返跑步
-   */
-  RunningBackAndForth,
   /**
    * 身高体重
    */
@@ -111,8 +111,8 @@ export interface RecordService {
   init(): Promise<void>;
   getById(id: string): Promise<TestRecord>;
   save(r: TestRecord): Promise<TestRecord>;
-  searchStudent(keyword: string): Promise<string[]>;
-  getByStudent(name: string, pagination: Pagination): Promise<TestRecord[]>;
+  searchStudent(keyword: string): Promise<{name: string, no: string}[]>;
+  getByStudentNo(no: string, type: TestType, pagination: Pagination): Promise<TestRecord[]>;
   getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
   sync(): Promise<void>;
 }

@@ -12,6 +12,7 @@ export const DRP_LOAD_RECORDS = 'DRP_LOAD_RECORDS';
 export const DRPloadRecords = (date: Date, type: TestType | null, pagination: Pagination) => {
   return {
     type: DRP_LOAD_RECORDS,
+    pagination,
     promise: new ActionPromsie(RecordService('getByDate')(date, type, pagination)),
   };
 }

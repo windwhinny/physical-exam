@@ -4,6 +4,7 @@
     "config/**/*",
     "scripts/**/*",
     "src/lib/**/*",
-    "src/index.ts"
+    "src/index.ts",
+    "src/services/**/*"
   ]
 }

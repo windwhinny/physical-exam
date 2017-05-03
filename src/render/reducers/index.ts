@@ -4,6 +4,8 @@ import user, { UserState } from './user';
 import selectedDate  from './selectedDate';
 import app, { AppState } from './app';
 import dailyReportPage, { DailyReportPageState } from './dailyReportPage';
+import searchPage, { SearchPageState } from './searchPage';
+import studentPage, { StudentPageState } from './studentPage';
 
 export default combineReducers({
   app,
@@ -11,6 +13,8 @@ export default combineReducers({
   selectedDate,
   routing: routerReducer,
   dailyReportPage,
+  searchPage,
+  studentPage,
 })
 
 export type State = {
@@ -18,4 +22,6 @@ export type State = {
   selectedDate: Date,
   app: AppState,
   dailyReportPage: DailyReportPageState,
+  searchPage: SearchPageState,
+  studentPage: StudentPageState,
 }

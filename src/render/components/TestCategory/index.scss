@@ -9,6 +9,21 @@
     position: relative;
     display: block;
     color: #333;
+    .icon-wrapper{
+      height: 160px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    svg{
+      max-width: 110px;
+      max-height: 110px;
+      text{
+        font-size: 30px;
+        font-weight: bold;
+      }
+    }
     .name{
       position: absolute;
       left: 0;

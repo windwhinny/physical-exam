@@ -3,7 +3,9 @@ import {
   DRPloadRecordsAction,
   DRP_CLEAR,
 } from '../actions/dailyReportPage';
-
+import {
+  defaultPagination,
+} from './common';
 import {
   TestRecord,
   Pagination,
@@ -44,20 +46,27 @@ export default (
     case DRP_CLEAR:
       return Object.assign({}, state, {
         records: [],
+        pagination: defaultPagination,
       });
     case '@@router/LOCATION_CHANGE':
       action = action as RouteAction;
       if (action.payload.pathname === '/daily') {
         return Object.assign({}, state, {
           records: [],
+          pagination: defaultPagination,
         });
       }
       break;
-    case DRP_LOAD_RECORDS:
-      action = action as DRPloadRecordsAction;
-      return handlePromise(state, 'records', action, records => {
+    case DRP_LOAD_RECORDS: {
+      const ac  = action as DRPloadRecordsAction;
+      return handlePromise(state, 'records', ac, records => {
         return state.records.concat(records);
+      }, s => {
+        return Object.assign({}, s, {
+          pagination: ac.pagination
+        })
       });
+    }
   }
 
   return state;

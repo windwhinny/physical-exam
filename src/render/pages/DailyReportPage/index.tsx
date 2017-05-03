@@ -14,6 +14,7 @@ import {
 import {
   TestRecord,
   Pagination,
+  TestType,
 } from '../../../constants';
 import {
   TestName,
@@ -25,6 +26,7 @@ type Props = RouteComponentProps<{
   date: Date,
   records: TestRecord[],
   pagination: Pagination,
+  pending: boolean,
 };
 
 type State = {
@@ -42,18 +44,46 @@ class DailyReportPage extends React.PureComponent<Props, State> {
     bindMethod(this, ['toggleCalendar']);
   }
 
+  componentDidMount() {
+    this.fetch(this.props.date, Object.assign({}, this.props.pagination, {
+      page: 1,
+    }));
+  }
+
+  getTestType(): TestType {
+    const { location } = this.props;
+    const path = url.parse(location.search, true);
+    return path.query.item;
+  }
+
+  fetch(date: Date, pagination: Pagination) {
+    actions.DRPloadRecords(date, this.getTestType(), pagination)
+  }
+
   componentWillReceiveProps(newProps: Props) {
-    if (newProps.date.getTime() !== this.props.date.getTime()) [
+    if (newProps.date.getTime() !== this.props.date.getTime()) {
+      actions.DRPClear();
+      this.fetch(newProps.date, this.nextPage());
       this.setState({
         isCalendarShow: false,
       })
-    ]
+    }
   }
 
   toggleCalendar() {
     this.setState({
       isCalendarShow: !this.state.isCalendarShow,
     })
+  }
+  nextPage() {
+    return Object.assign({}, this.props.pagination, {
+      page: this.props.pagination.page + 1,
+    });
+  }
+
+  onScrollToBottom() {
+    if (this.props.pending) return;
+    this.fetch(this.props.date, this.nextPage());
   }
 
   render() {
@@ -62,7 +92,6 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       location,
       date,
       records,
-      pagination,
     } = this.props;
     const { isCalendarShow } = this.state;
     const path = url.parse(location.search, true);
@@ -79,7 +108,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       <div className={cx('calendar-container', isCalendarShow && 'show')}>
         <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>
       </div>
-      <TestResult date={date} records={records} type={path.query.item} pagination={pagination}/>
+      <TestResult type={this.getTestType()} records={records} onScrollToBottom={this.onScrollToBottom}/>
     </div>;
   }
 }
@@ -88,4 +117,5 @@ export default connect((state: RootState) => ({
   date: state.selectedDate,
   records: state.dailyReportPage.records,
   pagination: state.dailyReportPage.pagination,
+  pending: state.dailyReportPage.pending,
 }))(DailyReportPage);
