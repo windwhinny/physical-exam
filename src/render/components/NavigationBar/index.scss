@@ -15,13 +15,39 @@
   }
   .arrow{
     color: #5393ff;
+    padding: 30px;
+    .arrow-inner{
+      transform: rotate(45deg);
+      position: relative;
+      display: block;
+      width: 30px;
+      height: 30px;
+      &:after, &:before{
+        content: ' ';
+        display: block;
+        position: absolute;
+        background: currentColor;
+      }
+      &:after{
+        bottom: 0;
+        height: 4px;
+        left: 0;
+        right: 0;
+      }
+      &:before{
+        bottom: 0;
+        width: 4px;
+        left: 0;
+        top: 0;
+      }
+    }
   }
   .title{
     color: #333; 
   }
 
   &.fusion {
-    .arrow, .title, .action {
+    .title, .action {
       color: inherit;
     }
     border-color: transparent;

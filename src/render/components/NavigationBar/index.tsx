@@ -32,7 +32,7 @@ export default class NavigationBar extends React.PureComponent<Props, void> {
     }
 
     return <div className={cx('navigation-bar', mode)}>
-      <div className="arrow" onClick={this.props.onBack}>{'<'}</div>
+      <div className="arrow" onClick={this.props.onBack}><span className="arrow-inner"></span></div>
       {children}
       {haveAction ? null : <Action></Action>}
     </div>;

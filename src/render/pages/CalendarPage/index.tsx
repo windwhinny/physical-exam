@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Calendar from '../../components/Calendar';
 import NavigationBar, { Title, Action } from '../../components/NavigationBar';
 import { RouteComponentProps } from 'react-router';
+import SearchIcon from '../../components/SearchIcon';
 import { Link } from 'react-router-dom';
 import actions from '../../actions';
 import {
@@ -66,7 +67,7 @@ class CalendarPage extends React.Component<Props, State> {
             {this.renderMonth()}
           </Title>
           <Action>
-            <Link to="/search">搜索</Link>
+            <Link to="/search"><SearchIcon/></Link>
           </Action>
         </NavigationBar>
         <Calendar date={date}

@@ -17,6 +17,13 @@
     border-bottom: 1px solid #dcdcdc;
     .title {
       flex: 1;
+      position: relative;
+      svg{
+        position: absolute;
+        left: 50px;
+        top: 10px;
+        color:  #b5b4b9;
+      }
     }
     .arrow{
       display: none;

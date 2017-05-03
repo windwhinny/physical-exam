@@ -1,5 +1,6 @@
 import React = require('react');
 import NavigationBar, { Title, Action } from '../../components/NavigationBar';
+import SearchIcon from '../../components/SearchIcon';
 import actions from '../../actions';
 import { State as RootState } from '../../store';
 import { connect } from 'react-redux';
@@ -52,6 +53,7 @@ class SearchPage extends React.Component<Props, void> {
       <header>
         <NavigationBar mode="fusion">
           <Title>
+            <SearchIcon />
             <input placeholder="姓名/学号" onChange={this.search} ref="input" value={keyword}/>
           </Title>
           <Action>
