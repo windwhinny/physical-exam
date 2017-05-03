@@ -23,13 +23,14 @@ require('./index.scss');
 type State = {
   dates: DateData[][],
   wrapperSize?: ClientRect,
-  activeMonth: [number, number],
   offset: number,
   baseDate: Date,
   renderer?: CanvasRenderer,
 }
 
-type Props = CommonCalendarProps;
+type Props = CommonCalendarProps & {
+  activeMonth: [number, number],
+};
 
 
 export {
@@ -48,7 +49,6 @@ export default class Calendar extends React.Component<Props, State> {
       baseDate: date,
       offset: 0,
       dates: [],
-      activeMonth: [date.getFullYear(), date.getMonth()]
     }
 
     this.resizeCallback = throttle(this.resizeCallback, 500);
@@ -64,17 +64,10 @@ export default class Calendar extends React.Component<Props, State> {
     ]);
   }
 
-  componentWillReceiveProps(newProps: Props, oldProps: Props) {
-    if (newProps.activeMonth === oldProps.activeMonth) return;
-    if (!newProps.activeMonth) return;
-    this.setState({
-      activeMonth: newProps.activeMonth,
-    });
-  }
 
   generateDates(rowOffset: number) {
     const dates: DateData[][] = [];
-    const am = this.state.activeMonth;
+    const am = this.props.activeMonth;
     const year = this.state.baseDate.getFullYear();
     const month = this.state.baseDate.getMonth();
     const startOfBaseMonth = new Date(year, month, 1);
@@ -168,8 +161,8 @@ export default class Calendar extends React.Component<Props, State> {
   }
 
   renderCanvas() {
-    const { renderer, activeMonth, offset } = this.state;
-    const { date } = this.props;
+    const { renderer, offset } = this.state;
+    const { date, activeMonth } = this.props;
     if (!this.refs.canvas) return;
     if (!renderer) {
       this.initCanvas();
@@ -190,10 +183,6 @@ export default class Calendar extends React.Component<Props, State> {
     if (this.props.onHoveredMonthChanged) {
       this.props.onHoveredMonthChanged(year, month);
     }
-
-    this.setState({
-      activeMonth: [year, month],
-    });
   }
 
   touchStart(e: React.TouchEvent<HTMLDivElement>) {

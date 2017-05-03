@@ -31,17 +31,19 @@ type Props = RouteComponentProps<{
 
 type State = {
   isCalendarShow: boolean,
+  activeMonth: [number, number],
 }
 
 class DailyReportPage extends React.PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
-
+    const { date } = this.props;
     this.state = {
       isCalendarShow: false,
+      activeMonth: [date.getFullYear(), date.getMonth()],
     }
 
-    bindMethod(this, ['toggleCalendar']);
+    bindMethod(this, ['toggleCalendar', 'onHoveredMonthChanged']);
   }
 
   componentDidMount() {
@@ -86,6 +88,12 @@ class DailyReportPage extends React.PureComponent<Props, State> {
     this.fetch(this.props.date, this.nextPage());
   }
 
+  onHoveredMonthChanged(year: number, month: number) {
+    this.setState({
+      activeMonth: [year, month],
+    });
+  }
+
   render() {
     const {
       history,
@@ -93,20 +101,26 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       date,
       records,
     } = this.props;
-    const { isCalendarShow } = this.state;
+    const { isCalendarShow, activeMonth } = this.state;
     const path = url.parse(location.search, true);
     return <div className="daily-report">
       <NavigationBar onBack={history.goBack}>
         <Title>
+          {isCalendarShow ?
+          <div className="title-inner" onClick={this.toggleCalendar}>
+            <div className="big-date">{activeMonth[0]}年{activeMonth[1] + 1}月</div>
+          </div>
+          :
           <div className="title-inner" onClick={this.toggleCalendar}>
             <div className="test-name">{TestName[path.query.item]}</div>
             <div className="date">{date.getMonth() + 1}月{date.getDate()}日</div>
           </div>
+          }
         </Title>
       </NavigationBar>
       <div className={cx('mask', isCalendarShow && 'show')} onClick={this.toggleCalendar}></div>
       <div className={cx('calendar-container', isCalendarShow && 'show')}>
-        <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate}/>
+        <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate} onHoveredMonthChanged={this.onHoveredMonthChanged} activeMonth={activeMonth}/>
       </div>
       <TestResult type={this.getTestType()} records={records} onScrollToBottom={this.onScrollToBottom}/>
     </div>;
