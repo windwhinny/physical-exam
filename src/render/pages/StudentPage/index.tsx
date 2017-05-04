@@ -32,7 +32,8 @@ class StudentPage extends React.Component<Props, void> {
 
   componentDidMount() {
     this.fetch(this.props.type, Object.assign({}, this.props.pagination, {
-      page: 1
+      page: 1,
+      done: false,
     }));
   }
 
@@ -47,6 +48,7 @@ class StudentPage extends React.Component<Props, void> {
   }
 
   onScrollToBottom() {
+    if (this.props.pagination.done) return;
     if (this.props.pending) return;
     this.fetch(this.props.type, Object.assign({}, this.props.pagination, {
       page: this.props.pagination.page + 1,
@@ -62,8 +64,9 @@ class StudentPage extends React.Component<Props, void> {
   onSelectType(type: TestType) {
     actions.studentPageSwitchItem(type)
     this.fetch(type, {
-      page: 0,
-      limit: 1,
+      page: 1,
+      limit: 10,
+      done: false,
     });
   }
 

@@ -43,6 +43,7 @@ export default (
     case CP_LOAD_RECORDS:
       const ac = action as CPloadRecordsAction;
       return handlePromise(state, 'records', ac,  s => {
+        if (!s.length) ac.pagination.done = true;
         if (ac.pagination.page !== state.pagination.page) {
           console.log('appended')
           return state.records.concat(s);

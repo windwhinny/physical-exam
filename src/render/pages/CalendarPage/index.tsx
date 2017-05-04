@@ -61,7 +61,8 @@ class CalendarPage extends React.Component<Props, State> {
     const { date, type, pagination } = this.props;
     actions.CPClear();
     this.fetch(date, type, Object.assign({}, pagination, {
-      page: 1
+      page: 1,
+      done: false,
     }));
   }
 
@@ -91,6 +92,7 @@ class CalendarPage extends React.Component<Props, State> {
 
   onScrollToBottom() {
     const { date, type, pagination } = this.props;
+    if (this.props.pagination.done) return;
     this.fetch(date, type, Object.assign({}, pagination, {
       page: pagination.page + 1,
     }));
@@ -101,6 +103,7 @@ class CalendarPage extends React.Component<Props, State> {
     actions.updateSelectedDate(date);
     this.fetch(date, type, Object.assign({}, pagination, {
       page: 1,
+      done: false,
     }));
   }
 

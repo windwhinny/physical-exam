@@ -22,10 +22,7 @@ const defaultState = {
   records: [],
   pending: false,
   error: null,
-  pagination: {
-    page: 1,
-    limit: 10,
-  }
+  pagination: defaultPagination,
 }
 
 type RouteAction = {
@@ -60,6 +57,7 @@ export default (
     case DRP_LOAD_RECORDS: {
       const ac  = action as DRPloadRecordsAction;
       return handlePromise(state, 'records', ac, records => {
+        if (!records.length) ac.pagination.done = true;
         return state.records.concat(records);
       }, s => {
         return Object.assign({}, s, {

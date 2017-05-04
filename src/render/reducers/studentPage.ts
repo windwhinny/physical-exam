@@ -40,6 +40,7 @@ export default (
   case GET_STUDENT_RECORDS: {
     let ac = action as GetStudentRecordsAction;
     return handlePromsie(state, 'records', ac, (s => {
+      if (!s.length) ac.pagination.done = true;
       if (state.pagination.page !== ac.pagination.page) {
         return state.records.concat(s);
       }

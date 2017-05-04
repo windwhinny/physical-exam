@@ -43,7 +43,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       activeMonth: [date.getFullYear(), date.getMonth()],
     }
 
-    bindMethod(this, ['toggleCalendar', 'onHoveredMonthChanged']);
+    bindMethod(this, ['toggleCalendar', 'onHoveredMonthChanged', 'onScrollToBottom']);
   }
 
   componentDidMount() {
@@ -85,6 +85,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
 
   onScrollToBottom() {
     if (this.props.pending) return;
+    if (this.props.pagination.done) return;
     this.fetch(this.props.date, this.nextPage());
   }
 

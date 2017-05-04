@@ -1,4 +1,11 @@
 .calendar-page{
+  position: absolute;
+  top:0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
   header{
     background: linear-gradient(to bottom, #6677ff, #48a2ff);
   }
@@ -10,5 +17,9 @@
     .action a{
       color: white;
     }
+  }
+  .test-result{
+    flex: 1;
+    overflow-y: auto;
   }
 }

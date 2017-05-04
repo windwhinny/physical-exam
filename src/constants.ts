@@ -105,6 +105,7 @@ export type TestRecord = {
 export type Pagination = {
   limit: number,
   page: number,
+  done: boolean,
 }
 
 export interface RecordService {
