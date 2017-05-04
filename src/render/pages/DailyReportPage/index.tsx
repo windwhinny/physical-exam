@@ -1,8 +1,9 @@
 import React = require('react');
 import { RouteComponentProps } from 'react-router';
-import NavigationBar, { Title } from '../../components/NavigationBar';
+import NavigationBar, { Title, Action } from '../../components/NavigationBar';
 import { connect } from 'react-redux';
 import { State as RootState } from '../../store';
+import { Link } from 'react-router-dom';
 import Calendar from '../../components/Calendar';
 import TestResult from '../../components/TestResult';
 import url = require('url');
@@ -118,6 +119,9 @@ class DailyReportPage extends React.PureComponent<Props, State> {
           </div>
           }
         </Title>
+        <Action>
+          <Link to="/addStudent">添加学生信息</Link>
+        </Action>
       </NavigationBar>
       <div className={cx('mask', isCalendarShow && 'show')} onClick={this.toggleCalendar}></div>
       <div className={cx('calendar-container', isCalendarShow && 'show')}>
