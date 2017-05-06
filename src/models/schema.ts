@@ -15,6 +15,7 @@ export const RecordModelSchema = {
   result: FieldType.INTEGER,
   testTime: FieldType.DATETIME,
   synced: FieldType.INTEGER,
+  date: FieldType.TEXT,
 }
 
 export type RecordPO = {
@@ -26,4 +27,5 @@ export type RecordPO = {
   result: number,
   testTime: Date,
   synced: number,
+  date: string,
 }

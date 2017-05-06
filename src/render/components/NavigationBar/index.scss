@@ -8,6 +8,7 @@
   width: 100%;
   font-size: 30px;
   border-bottom: 1px solid #E5E5E5;
+  position: relative;
   .arrow, .title, .action {
     display: inline-block;
     align-content: center;
@@ -44,6 +45,10 @@
   }
   .title{
     color: #333; 
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   &.fusion {

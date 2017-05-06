@@ -115,5 +115,6 @@ export interface RecordService {
   searchStudent(keyword: string): Promise<{name: string, no: string}[]>;
   getByStudentNo(no: string, type: TestType, pagination: Pagination): Promise<TestRecord[]>;
   getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
+  getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(): Promise<void>;
 }

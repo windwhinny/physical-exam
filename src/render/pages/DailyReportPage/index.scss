@@ -19,6 +19,28 @@
         font-size: 30px;
       }
     }
+    .action a{
+      color: #5393ff;
+      font-size: 30px;
+    }
+    .date::after, .big-date::after{
+      content: ' ';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border: 7px;
+      border-style: solid;
+      border-color: transparent;
+      border-top-color: #d6d6d6;
+      margin-left: 10px;
+      transform: translateY(5px);
+    }
+    .big-date::after{
+      border-top-color: transparent;
+      border-bottom-color: #d6d6d6;
+      border-width: 10px;
+      transform: translateY(-7px);
+    }
   }
   .calendar{
     .calendar-header{
@@ -31,11 +53,15 @@
         background-color: #5393ff;
       }
     }
+    .note{
+      color: #5393ff;
+    }
   }
   .calendar-container{
     position: absolute;
     left: 0;
     right: 0;
+    top: 90px;
     background-color: white;
     transform: translateY(-100%);
     transition: transform 0.3s ease;

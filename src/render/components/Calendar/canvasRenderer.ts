@@ -11,6 +11,7 @@ export type FrameOptions = {
   getDateSet: (rowOffset: number) => DateData[][],
   setActiveMonth: (year: number, month: number) => void,
   activeMonth: [number, number],
+  activeDates: [number, number, number][],
   offset: number,
 }
 
@@ -103,6 +104,10 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
         if (year === td[0] && month === td[1] && date === td[2]) {
           this.drawCircle(x, y, Math.min(cellSize.height, cellSize.width) * 0.3, unactiveColor);
           this.drawText(String(date), x, y, this.extraStyle.highLight.color);
+        }
+
+        if (frameOptions.activeDates.find(a => a[0] === year && a[1] === month && a[2] === date)) {
+          this.drawCircle(x, y - cellSize.height * 0.4, this.options.style.fontSize * 0.3, this.extraStyle.note.color);
         }
 
         // 高亮选中日期

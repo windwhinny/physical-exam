@@ -13,7 +13,6 @@ export type RenderOptions = {
 export type DateData = {
   date: Date,
   disabled: boolean,
-  haveData: boolean,
 }
 
 export type Rect = {

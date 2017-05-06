@@ -3,6 +3,7 @@ import {
   bindMethod,
   throttle,
 } from '../../../lib/utils';
+import RecordService from '../../services/Record';
 import { oneDay } from '../../../lib/date';
 import {
   DataSetGetter,
@@ -17,6 +18,9 @@ import CanvasRenderer, {
   Rect,
   DateData,
 } from './CanvasRenderer';
+import {
+  TestType,
+} from '../../../constants';
 
 require('./index.scss');
 
@@ -26,10 +30,15 @@ type State = {
   offset: number,
   baseDate: Date,
   renderer?: CanvasRenderer,
+  activeDates: {
+    offset: number | null,
+    dates: [number, number, number][],
+  },
 }
 
 type Props = CommonCalendarProps & {
   activeMonth: [number, number],
+  type?: TestType
 };
 
 
@@ -49,9 +58,15 @@ export default class Calendar extends React.Component<Props, State> {
       baseDate: date,
       offset: 0,
       dates: [],
+      activeDates: {
+        offset: null,
+        dates: [],
+      },
     }
 
     this.resizeCallback = throttle(this.resizeCallback, 500);
+    this.getActiveDates = throttle(this.getActiveDates, 300);
+
     bindMethod(this, [
       'renderCanvas',
       'touchStart',
@@ -63,7 +78,6 @@ export default class Calendar extends React.Component<Props, State> {
       'resizeCallback',
     ]);
   }
-
 
   generateDates(rowOffset: number) {
     const dates: DateData[][] = [];
@@ -84,13 +98,30 @@ export default class Calendar extends React.Component<Props, State> {
         row.push({
           date,
           disabled: date < startOfActivedMonth || date > endOfActivedMonth,
-          haveData: false,
         });
       }
       dates.push(row);
     }
-
+    if (this.state.activeDates.offset !== rowOffset) {
+      this.getActiveDates(rowOffset, dates);
+    };
     return dates;
+  }
+
+  async getActiveDates(offset: number, dates: DateData[][]) {
+    const from = dates[0][0].date;
+    const to = dates[dates.length - 1][dates[dates.length - 1].length - 1].date;
+    const { type } = this.props;
+    const rs = await RecordService('getByDateRange')(from, to, type);
+    this.setState({
+      activeDates: {
+        offset,
+        dates: rs.map(s => {
+          const d = new Date(s);
+          return [d.getFullYear(), d.getMonth(), d.getDate()];
+        }) as [number, number, number][],
+      },
+    });
   }
 
   componentDidMount() {
@@ -161,7 +192,7 @@ export default class Calendar extends React.Component<Props, State> {
   }
 
   renderCanvas() {
-    const { renderer, offset } = this.state;
+    const { renderer, offset, activeDates } = this.state;
     const { date, activeMonth } = this.props;
     if (!this.refs.canvas) return;
     if (!renderer) {
@@ -174,6 +205,7 @@ export default class Calendar extends React.Component<Props, State> {
       setActiveMonth: this.setActiveMonth,
       offset,
       activeMonth,
+      activeDates: activeDates.dates,
     });
     this.cells = renderer.cells;
     this.cellSize = renderer.cellCSSSize;

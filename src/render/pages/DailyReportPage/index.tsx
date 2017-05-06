@@ -66,7 +66,10 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   componentWillReceiveProps(newProps: Props) {
     if (newProps.date.getTime() !== this.props.date.getTime()) {
       actions.DRPClear();
-      this.fetch(newProps.date, this.nextPage());
+      const { pagination } = this.props;
+      this.fetch(newProps.date, Object.assign({}, pagination, {
+        page: 1,
+      }));
       this.setState({
         isCalendarShow: false,
       })
@@ -111,7 +114,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
           {isCalendarShow ?
           <div className="title-inner" onClick={this.toggleCalendar}>
             <div className="big-date">{activeMonth[0]}年{activeMonth[1] + 1}月</div>
-          </div>
+         </div>
           :
           <div className="title-inner" onClick={this.toggleCalendar}>
             <div className="test-name">{TestName[path.query.item]}</div>
@@ -125,7 +128,13 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       </NavigationBar>
       <div className={cx('mask', isCalendarShow && 'show')} onClick={this.toggleCalendar}></div>
       <div className={cx('calendar-container', isCalendarShow && 'show')}>
-        <Calendar date={date} onSelectedDateChanged={actions.updateSelectedDate} onHoveredMonthChanged={this.onHoveredMonthChanged} activeMonth={activeMonth}/>
+        <Calendar
+          date={date}
+          onSelectedDateChanged={actions.updateSelectedDate}
+          onHoveredMonthChanged={this.onHoveredMonthChanged}
+          activeMonth={activeMonth}
+          type={this.getTestType()}
+          />
       </div>
       <TestResult type={this.getTestType()} records={records} onScrollToBottom={this.onScrollToBottom}/>
     </div>;

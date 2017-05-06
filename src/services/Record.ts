@@ -3,6 +3,8 @@ import electron = require('electron');
 import {
   getStartOfDate,
   getEndOfDate,
+  getDateString,
+  oneDay,
 } from '../lib/date';
 import RecordModel, { RecordPO } from '../models/Record'
 import {
@@ -34,6 +36,7 @@ class RecordService implements RecordServiceInterface {
     }
   }
   private transform(r: TestRecord): RecordPO {
+    const date = new Date(r.date);
     return {
       uuid: r.id,
       stuNo: r.student.nu,
@@ -41,8 +44,9 @@ class RecordService implements RecordServiceInterface {
       item: TestCode[r.test.type],
       score: r.test.score,
       result: 1,
-      testTime: new Date(r.date),
+      testTime: date,
       synced: 0,
+      date: getDateString(date),
     }
   }
 
@@ -108,6 +112,31 @@ class RecordService implements RecordServiceInterface {
       offset: (pagination.page - 1) * pagination.limit,
     }) as RecordPO[];
     return rs.map(this.reverse);
+  }
+
+  async getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]> {
+    const dateStrs = [];
+    from = new Date(from);
+    to = new Date(to);
+    console.log('from', from , 'to', to);
+    while (from.getTime() <= to.getTime()) {
+      dateStrs.push(getDateString(from));
+      from = new Date(from.getTime() + oneDay);
+    }
+
+    // tslint:disable-next-line:no-any
+    const where: any = {
+      date: { $in: dateStrs },
+    }
+
+    if (type) {
+      where.item = TestCode[type];
+    }
+    const ret = await this.model.find({
+      where,
+      distinct: ['date'],
+    }) as {date: string}[];
+    return ret.map(r => r.date);
   }
 
   async getByDate(date: Date, item: TestType | null, pagination: Pagination): Promise<TestRecord[]> {

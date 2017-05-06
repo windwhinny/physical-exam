@@ -3,10 +3,12 @@ import {
   bindMethod,
 } from '../../../lib/utils';
 import NavigationBar, { Title } from '../../components/NavigationBar';
-require('./index.scss');
-type Props = {
+import { RouteComponentProps } from 'react-router';
 
-}
+require('./index.scss');
+type Props = RouteComponentProps<{
+  item: number,
+}>;
 
 type State = {
   name: string,
@@ -51,7 +53,7 @@ export default class AddStudentPage extends React.Component<Props, State> {
   render() {
     const { name, no } = this.state;
     return <div className="add-student-page">
-      <NavigationBar>
+      <NavigationBar onBack={() => this.props.history.goBack()}>
         <Title>添加学生信息</Title>
       </NavigationBar>
       <form onSubmit={this.onSubmit}>

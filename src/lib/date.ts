@@ -30,3 +30,8 @@ export function getEndOfDate(idate: Date): Date {
 
   return new Date(date.setDate(date.getDate() + 1) - 1);
 }
+
+export function getDateString(date: Date) {
+  date = new Date(date);
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}
