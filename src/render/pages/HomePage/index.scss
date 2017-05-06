@@ -33,4 +33,14 @@
     color: white;
     font-size: 30px;
   }
+  .dialog{
+    input{
+      outline: 0;
+      font-family: inherit;
+      border: 0;
+      border-bottom: 1px solid #e5e5e5;
+      width: 100%;
+      font-size: 30px;
+    }
+  }
 }

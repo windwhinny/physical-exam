@@ -1,5 +1,6 @@
 import DB from '../lib/DB';
 import electron = require('electron');
+import request = require('request');
 import {
   getStartOfDate,
   getEndOfDate,
@@ -159,8 +160,75 @@ class RecordService implements RecordServiceInterface {
     return rs.map(this.reverse);
   }
 
-  async sync() {
+  async sync(
+    onProgress: (t: number, c: number) => void,
+    host: string = 'http://47.93.230.19:8080/score/saves',
+    limit: number = 5,
+  ): Promise<void> {
+    const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
+    let proccessed = 0;
+    if (total) return;
+    const get = () => this.model.find({
+        where: {
+          synced: 0,
+        },
+        limit,
+      }) as Promise<RecordPO[]>;
 
+    const update = (data: RecordPO[]) => {
+      return this.model.update({
+        synced: 1,
+      }, {
+        uuid: { $in: data.map(d => d.uuid as string)},
+      });
+    };
+
+    const fetch = (data: RecordPO[]) =>
+      new Promise((resolve, reject) => {
+        const body = (data.map(d => Object.assign({}, d, {
+          testTime: getDateString(d.testTime),
+          date: undefined,
+          synced: undefined,
+        })));
+        console.log(body);
+        request({
+          url: host,
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+          },
+          body,
+          json: true,
+        // tslint:disable-next-line:no-any
+        }, (err: Error, _: any, resBody: { code: number }) => {
+          if (err) return reject(err);
+          if (resBody.code !== 1) return reject(new Error('上传失败'));
+          resolve();
+          _;
+        });
+      });
+
+    // const fetch = () => new Promise(resolve => {
+    //   setTimeout(resolve, 10000);
+    // });
+    let errorTimes = 0;
+    while (true) {
+      const rs = await get();
+      if (!rs.length) break;
+      try {
+        await fetch(rs);
+        await update(rs);
+        proccessed += rs.length;
+        // tslint:disable-next-line:no-any
+        onProgress((total as any)[0].count, proccessed);
+      } catch (e) {
+        console.error(e);
+        if (errorTimes >= 0) {
+          throw new Error('上传失败');
+        }
+        errorTimes++;
+      }
+    }
   }
 }
 
@@ -170,6 +238,16 @@ Object.getOwnPropertyNames(Object.getPrototypeOf(recordService)).forEach((name: 
   // tslint:disable-next-line:no-any
   ipcMain.on(channel, async (event: any, id: number, ...args: any[]) => {
     console.info('RECEIVE', name, ...args);
+    // tslint:disable-next-line:no-any
+    args = args.map(arg => {
+      if (Array.isArray(arg) && arg[0] === 'IPC-CALLBACK') {
+        // tslint:disable-next-line:no-any
+        return (...subargs: any[]) => {
+          event.sender.send(`RecordService:${name}:callback`, id, arg[1], subargs);
+        };
+      }
+      return arg;
+    });
     // tslint:disable-next-line:no-any
     let result: any;
     try {

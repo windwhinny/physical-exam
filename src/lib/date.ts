@@ -33,5 +33,7 @@ export function getEndOfDate(idate: Date): Date {
 
 export function getDateString(date: Date) {
   date = new Date(date);
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  const month = String(date.getMonth() + 101).slice(1, 3);
+  const d = String(date.getDate() + 100).slice(1, 3);
+  return `${date.getFullYear()}-${month}-${d}`;
 }

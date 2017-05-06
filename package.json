@@ -23,6 +23,7 @@
     "react-router-dom": "^4.1.1",
     "react-router-redux": "^5.0.0-alpha.6",
     "redux": "^3.6.0",
+    "request": "^2.81.0",
     "serialport": "^4.0.7",
     "sqlite3": "^3.1.8"
   },
@@ -37,6 +38,7 @@
     "@types/react-router": "^4.0.5",
     "@types/react-router-dom": "^4.0.4",
     "@types/react-router-redux": "^5.0.0",
+    "@types/request": "0.0.43",
     "@types/serialport": "^4.0.9",
     "@types/sqlite3": "^2.2.33",
     "@types/webpack": "^2.2.15",

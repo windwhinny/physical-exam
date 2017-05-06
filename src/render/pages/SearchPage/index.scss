@@ -18,7 +18,10 @@
     background: white;
     border-bottom: 1px solid #dcdcdc;
     .title {
+      top: 0;
+      left: 0;
       flex: 1;
+      transform: none;
       position: relative;
       svg{
         position: absolute;

@@ -27,3 +27,12 @@ export const DRPClear = () => {
 }
 const DRPClearRV = getReturnVal(DRPClear);
 export type DRPClearAction = typeof DRPClearRV;
+
+export const DRP_SYNC = 'DRP_SYNC';
+export const DRPSync = () => {
+  return {
+    type: DRP_SYNC,
+  };
+}
+const DRPSyncRV = getReturnVal(DRPSync);
+export type DRPSyncAction = typeof DRPSyncRV;
