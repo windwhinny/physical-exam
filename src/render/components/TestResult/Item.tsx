@@ -16,7 +16,7 @@ export default class TestResultItem extends React.PureComponent<Props, void> {
         <div className="name">{record.student.name}</div>
         <div className="code">{record.student.nu}</div>
       </div>
-      <Score record={record}/>
+      <Score data={record.test.score} type={record.test.type}/>
     </div>;
   }
 }

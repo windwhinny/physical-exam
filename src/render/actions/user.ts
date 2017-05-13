@@ -2,7 +2,7 @@ import {
   getReturnVal,
 } from '../../lib/utils';
 export const LOGIN_OR_LOGOUT = 'LOGIN_OR_LOGOUT';
-export const loginOrLogout = (ip: string) => ({
+export const loginOrLogout = (ip: string | null) => ({
   type: LOGIN_OR_LOGOUT,
   ip,
 });

@@ -12,7 +12,7 @@ export default class TestResultItemByStudent extends React.PureComponent<Props, 
   render() {
     const { record } = this.props;
     return <div className="test-result-item">
-      <Score record={record}/>
+      <Score data={record.test.score} type={record.test.type}/>
       <div className="date">
         {new Date(record.date).toLocaleDateString()}
       </div>

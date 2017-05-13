@@ -1,28 +1,28 @@
 import React = require('react');
 
 import {
-  TestRecord,
+  TestType,
   TestUnitTemp,
 } from '../../../constants'
 
 type Props = {
-  record: TestRecord,
+  data: string,
+  type: TestType,
 }
 
 export default class Score extends React.Component<Props, void> {
-  getScoreDesc(record: TestRecord): string {
-    const score = record.test.score;
-    const temp = TestUnitTemp[record.test.type];
-    if (!temp) return score;
-    return score.split(',').reduce((str, v, i) => {
+  getScoreDesc(): string {
+    const { data, type } = this.props;
+    const temp = TestUnitTemp[type];
+    if (!temp) return data;
+    return data.split(',').reduce((str, v, i) => {
       return str.replace('$' + i, v);
     }, temp);
   }
 
   render() {
-    const { record } = this.props;
     return <div className="score">
-      <div className="value">{this.getScoreDesc(record)}</div>
+      <div className="value">{this.getScoreDesc()}</div>
     </div>;
   }
 }

@@ -12,7 +12,7 @@ export default function(
   action: LoginOrLogoutAction): UserState {
   switch (action.type) {
     case LOGIN_OR_LOGOUT:
-      if (user) {
+      if (!action.ip) {
         return null;
       } else {
         return { ip: action.ip };

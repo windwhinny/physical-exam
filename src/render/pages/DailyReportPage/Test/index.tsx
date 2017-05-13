@@ -13,6 +13,7 @@ import {
   TestState,
   TestDevice,
 } from '../../../reducers/dailyReportPage';
+import Score from '../../../components/Score';
 import Dialog from '../../../components/Dialog';
 
 export type Props = {
@@ -89,13 +90,13 @@ export default class extends React.Component<Props, State> {
   }
 
   renderDevice(device: TestDevice, index: number) {
-    const { status } = this.props;
+    const { status, type } = this.props;
     const student = this.props.students[index];
     const renderStatus = () => {
       const { score } = device;
       if (status === 'testing' || score) {
         return <div className="testing">
-          {score && <div className="score">{score.data}</div>}
+          {score && <Score data={score.data} type={type}/>}
           {status === 'testing' && <div className="status">测试中</div>}
         </div>;
       } else if (!student) {
