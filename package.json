@@ -6,7 +6,7 @@
   "scripts": {
     "launch": "electron .",
     "dev": "webpack-dev-server.cmd --config scripts/webpack.config.js",
-    "build": "webpack --config scripts/webpack.config.js"
+    "build": "node scripts/build"
   },
   "author": "",
   "license": "ISC",

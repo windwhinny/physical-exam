@@ -33,7 +33,7 @@ app.on('ready', () => {
   } else {
     createWindow(URL.format({
       protocol: 'file:',
-      pathname: path.join(__dirname, 'app.prod.html'),
+      pathname: path.join(__dirname, 'index.html'),
     }))
   }
 });
