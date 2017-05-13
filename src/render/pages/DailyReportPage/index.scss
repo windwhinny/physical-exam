@@ -6,6 +6,20 @@
   right: 0;
   display: flex;
   flex-direction: column;
+  &.testing{
+    .navigation-bar{
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    .calendar-container{
+      pointer-events: none;
+      opacity: 0;
+    }
+    .tab ul{
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
   .navigation-bar{
     background-color: white;
     position: relative;
@@ -82,6 +96,37 @@
     &.show{
       opacity: 1;
       pointer-events: all;
+    }
+  }
+  .tab{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    >ul{
+      margin: 0;
+      list-style: none;
+      padding: 0;
+      display: flex;
+      border-bottom: 1px solid #e5e5e5;
+      background: white;
+      li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        flex: 1;
+        height: 70px;
+        border-bottom: 4px solid transparent; 
+        &.active{
+          color: #5393ff;
+          border-bottom-color: #5393ff;
+        }
+      }
+    }
+    .test{
+      flex: 1;
+      overflow-y: auto;
     }
   }
   .test-result{

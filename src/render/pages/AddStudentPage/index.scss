@@ -22,11 +22,11 @@
         font-family: inherit;
         padding: 0 30px;
         width: 100%;
-        border: 0;
         height: 100px;
         font-size: 30px;
-        margin-bottom: 15px;
         outline: 0;
+        border: 0;
+        border-bottom: 1px solid #e5e5e5;
       }
     }
   }
@@ -40,6 +40,33 @@
     border: 0;
     &[disabled]{
       background: #d6d6d6;
+    }
+  }
+  .gender{
+    margin-top: 10px;
+    border-top: 1px solid #e5e5e5;
+    .male, .female{
+      height: 100px;
+      background: white;
+      border-bottom: 1px solid #e5e5e5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 30px;
+      padding: 0 30px;
+      color: #b5b4b9;
+      &.active{
+        color: #333333;
+        &:after{
+          content: ' ';
+          display: block;
+          width: 20px;
+          height: 40px;
+          border-right: 4px solid #4a9fff;
+          border-bottom: 4px solid #4a9fff;
+          transform: rotate(45deg);
+        }
+      }
     }
   }
 }

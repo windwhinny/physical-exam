@@ -23,3 +23,5 @@ if ((module as any).hot) {
 }
 
 render();
+
+document.title = '体育测试';

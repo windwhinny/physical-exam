@@ -10,22 +10,16 @@ import {
 import {
   TestType,
   TestCode,
+  DeviceManagerService,
+  Score,
+  ScoreType,
 } from '../../constants';
+import serviceIPCRegistor from '../registor';
 
-enum ScoreType {
-  RealTime,
-  Final,
-  Unknow,
-}
-type Score = {
-  type: ScoreType,
-  data: string,
-}
-
-export class DeviceManager extends Event.EventEmitter {
+export class DeviceManager extends Event.EventEmitter implements DeviceManagerService {
   deviceCont: DeviceConnector | null;
 
-  async searchDevices() {
+  async searchRF() {
     if (this.deviceCont) return true;
     const ports = await listPorts();
     const p = ports.find(_p => {
@@ -54,10 +48,13 @@ export class DeviceManager extends Event.EventEmitter {
 
   async getScore(device: string): Promise<null | Score> {
     if (!this.deviceCont) return null;
-    this.deviceCont.send('TK', Buffer.from(device));
-    const f = await this.deviceCont.await('TK', 1000, _f => {
-      return asciiToString(_f.data.slice(0, 3)) === device;
-    });
+    const f = await this.deviceCont.sendAndAwait(
+      'TK',
+      Buffer.from(device),
+      1000,
+      _f => {
+        return asciiToString(_f.data.slice(0, 3)) === device;
+      });
 
     let type: ScoreType = ScoreType.Unknow;
     if (f.data[4] === 'K'.charCodeAt(0)) {
@@ -74,27 +71,51 @@ export class DeviceManager extends Event.EventEmitter {
 
   async startTest() {
     if (!this.deviceCont) return null;
-    this.deviceCont.send('TH');
-    await this.deviceCont.await('TH');
+    await this.deviceCont.sendAndAwait('TH');
+    return true;
   }
 
   async endTest() {
     if (!this.deviceCont) return null;
-    this.deviceCont.send('TS');
-    await this.deviceCont.await('TS');
+    await this.deviceCont.sendAndAwait('TS');
+    return true;
   }
 
   async setTestType(type: TestType): Promise<null | true> {
     if (!this.deviceCont) return null;
-    this.deviceCont.send('SI', TestCode[type]);
-    await this.deviceCont.await('SI');
+    const f = await this.deviceCont.sendAndAwait('SI', 'FF');
+    const code = TestCode[type];
+    if (Buffer.from(f.data).toString() !== code) {
+      await this.deviceCont.sendAndAwait('SI', code);
+    }
     return true;
+  }
+
+  async getDeviceList() {
+    if (!this.deviceCont) return null;
+    const maxNo = Number(await this.getMaxDeviceNo());
+    let no = 1;
+    const devices: string[] = [];
+    while (no <= maxNo) {
+      const strNo = String(1000 + no).slice(1);
+      const f = await this.deviceCont.sendAndAwait(
+        'LK',
+        `S${strNo}`,
+        1000,
+        _f => {
+          return Buffer.from(_f.data.slice(1, 4)).toString() === strNo;
+        });
+      if (Buffer.from(f.data).toString()[4] === '1') {
+        devices.push(strNo);
+      }
+      no++;
+    }
+    return devices;
   }
 
   async getMaxDeviceNo(): Promise<string | null> {
     if (!this.deviceCont) return null;
-    this.deviceCont.send('LM', 'S');
-    const f = await this.deviceCont.await('LM');
+    const f = await this.deviceCont.sendAndAwait('LM', 'S', 2000);
     return asciiToString(f.data.slice(1, 4)) as string;
   }
 }
@@ -107,10 +128,6 @@ class DeviceConnector extends Event.EventEmitter {
     super();
     this.port = port;
     port.on('error', this.onError);
-    port.on('data', data => {
-      const f = receiveFrame(Buffer.from(data));
-      // console.log('RECEIVE', f);
-    });
     this.initPromise = new Promise((resolve, reject) => {
       const onOpen = () => {
         resolve();
@@ -146,59 +163,73 @@ class DeviceConnector extends Event.EventEmitter {
 
   async connect() {
     await this.initPromise;
-    await this.send('XR');
-    await this.await('XR');
+    await this.sendAndAwait('XR');
   }
 
-  async send(cmd: string, data?: string | Buffer) {
-    // console.log('SEND', cmd, data);
-    const f = makeFrame(cmd, data);
-    this.port.write(f);
-  }
-
-  await(cmd: string, timeout: number = 1000, verify?: (f: Frame) => boolean) {
+  async sendAndAwait(
+    cmd: string,
+    data?: string | Buffer,
+    timeout: number = 1000,
+    verify?: (f: Frame) => boolean
+  ) {
+    this.send(cmd, data);
+    // tslint:disable-next-line:no-any
+    let timmer: any;
     return new Promise((resolve, reject) => {
-      const cb = (data: number[]) => {
-        const f = receiveFrame(Buffer.from(data));
+      const cb = (_data: number[]) => {
+        const f = receiveFrame(Buffer.from(_data));
+        console.log(f);
         if (!f) return;
-        if (f.cmd.toLowerCase() === cmd.toLowerCase()) {
+        if (f.cmd.toLowerCase() === 'rr') {
+          setTimeout(() => {
+            this.send(cmd, data);
+          }, 3 * 1000);
+          _setTimeout(3 * 1000 + timeout);
+        } else if (f.cmd.toLowerCase() === cmd.toLowerCase()) {
           // tslint:disable-next-line:no-any
           if (verify) {
             if (!verify(f)) return;
           }
+          // tslint:disable-next-line:no-any
           (this.port as any).removeListener('data', cb);
           resolve(f);
+          clearTimeout(timmer);
         }
       };
 
-      setTimeout(() => {
-        reject(new Error('连接超时'));
-        // tslint:disable-next-line:no-any
-        (this.port as any).removeListener('data', cb);
-      }, timeout);
+      const _setTimeout = (t: number) => {
+        clearTimeout(timmer);
+        timmer = setTimeout(() => {
+          reject(new Error('连接超时'));
+          // tslint:disable-next-line:no-any
+          (this.port as any).removeListener('data', cb);
+        }, t);
+      }
+
+      _setTimeout(timeout);
       this.port.on('data', cb);
     }) as Promise<Frame>;
   }
-}
 
-async function test() {
-  const manager = new DeviceManager();
-  await manager.searchDevices();
-  await manager.startTest();
-  while (true) {
-    const s = await manager.getScore('001');
-    if (!s) continue;
-    if (s.data !== '0000') {
-      console.log(s);
-    }
+  send(cmd: string, data?: string | Buffer) {
+    // console.log('SEND', cmd, data);
+    const f = makeFrame(cmd, data);
+    this.port.write(f);
   }
-  // await manager.endTest();
-  return s;
 }
 
-test().then(result => {
-  console.log('ok', result);
-  process.exit();
-}, err => {
-  console.log(err);
-});
+const manager = new DeviceManager();
+serviceIPCRegistor(manager, 'DeviceManager');
+
+
+// async function test() {
+//   await manager.searchRF();
+//   if (!manager.deviceCont) return null;
+//   return manager.deviceCont.sendAndAwait('XS');
+// }
+
+// test().then((r) => {
+//     console.log('ok', r);
+// }, err => {
+//     console.error(err);
+// })

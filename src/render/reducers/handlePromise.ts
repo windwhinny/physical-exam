@@ -13,7 +13,7 @@ export default function<
   state: S,
   name: N,
   action: A,
-  updater: (r: S[N]) => S[N],
+  updater?: (r: S[N]) => S[N],
   onResolved?: (s: S) => S,
   onRejected?: (s: S) => S,
 ): S {
@@ -25,8 +25,12 @@ export default function<
         pending: true,
       });
     case 'resolved':
+      let result = action.promise.result;
+      if (updater) {
+        result = updater(result);
+      }
       newState = Object.assign({}, state, {
-        [name as string]: updater(action.promise.result),
+        [name as string]: result,
         error: null,
         pending: false,
       });

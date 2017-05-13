@@ -1,6 +1,6 @@
 import DB from '../lib/DB';
-import electron = require('electron');
 import request = require('request');
+import uuid = require('uuid');
 import {
   getStartOfDate,
   getEndOfDate,
@@ -18,8 +18,7 @@ import {
   Pagination,
   RecordService as RecordServiceInterface,
 } from '../constants';
-
-const ipcMain = electron.ipcMain;
+import serviceIPCRegistor from './registor';
 
 class RecordService implements RecordServiceInterface {
   private model: RecordModel;
@@ -48,6 +47,7 @@ class RecordService implements RecordServiceInterface {
       testTime: date,
       synced: 0,
       date: getDateString(date),
+      gendar: r.student.gender,
     }
   }
 
@@ -61,6 +61,7 @@ class RecordService implements RecordServiceInterface {
       student: {
         name: r.stuName,
         nu: r.stuNo,
+        gender: r.gendar,
       },
       test: {
         score: r.score,
@@ -78,10 +79,18 @@ class RecordService implements RecordServiceInterface {
     return this.reverse(po);
   }
 
-  async save(r: TestRecord): Promise<TestRecord> {
-    let po = this.transform(r);
-    po = await this.model.insert(po) as RecordPO;
-    return this.reverse(po);
+  async save(records: TestRecord[]): Promise<TestRecord[]> {
+    return this.model.db.transaction((t) => {
+      return [(async () => {
+        let pos = records.map(r => {
+          const po = this.transform(r)
+          po.uuid = uuid.v4();
+          return po;
+        });
+        pos = await this.model.insertMulti(pos, t) as RecordPO[];
+        return pos.map(p => this.reverse(p));
+      })()];
+    })
   }
 
   async searchStudent(keyword: string): Promise<{name: string, no: string}[]> {
@@ -190,7 +199,6 @@ class RecordService implements RecordServiceInterface {
           date: undefined,
           synced: undefined,
         })));
-        console.log(body);
         request({
           url: host,
           method: 'POST',
@@ -233,32 +241,5 @@ class RecordService implements RecordServiceInterface {
 }
 
 const recordService = new RecordService();
-Object.getOwnPropertyNames(Object.getPrototypeOf(recordService)).forEach((name: keyof RecordService) => {
-  const channel = `RecordService:${name}`;
-  // tslint:disable-next-line:no-any
-  ipcMain.on(channel, async (event: any, id: number, ...args: any[]) => {
-    console.info('RECEIVE', name, ...args);
-    // tslint:disable-next-line:no-any
-    args = args.map(arg => {
-      if (Array.isArray(arg) && arg[0] === 'IPC-CALLBACK') {
-        // tslint:disable-next-line:no-any
-        return (...subargs: any[]) => {
-          event.sender.send(`RecordService:${name}:callback`, id, arg[1], subargs);
-        };
-      }
-      return arg;
-    });
-    // tslint:disable-next-line:no-any
-    let result: any;
-    try {
-      result = await recordService[name].apply(recordService, args);
-    } catch (e) {
-      console.error('ERROR', e);
-      event.sender.send(`RecordService:${name}:reject`, id, e);
-      return;
-    }
-    event.sender.send(`RecordService:${name}:resolve`, id, result);
-  });
-});
-
+serviceIPCRegistor(recordService, 'RecordService');
 export default recordService;

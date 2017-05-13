@@ -7,7 +7,7 @@ const publicPath = 'http://localhost:8080/'
 export default {
   output: {
     filename: '[name].js',
-    path: path.resolve(root, './dist'),
+    path: path.resolve(root, './src'),
     publicPath,
   },
   resolve: {
@@ -60,7 +60,7 @@ export default {
   target: 'electron-renderer',
   devServer: {
     hot: true,
-    contentBase: path.join(root, 'dist'),
+    contentBase: path.join(root, 'src'),
     publicPath,
     port: 8080,
   },

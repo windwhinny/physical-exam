@@ -11,7 +11,7 @@ type Props = {
 export default class TestResultItem extends React.PureComponent<Props, void> {
   render() {
     const { record } = this.props;
-    return <div className="test-result-item">
+    return <div className="test-result-item" key={record.id}>
       <div className="student">
         <div className="name">{record.student.name}</div>
         <div className="code">{record.student.nu}</div>

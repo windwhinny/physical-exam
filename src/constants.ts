@@ -89,13 +89,16 @@ export const TestCode = {
   [TestType.MedicineBall]: 'SX',
 }
 
+export type Student = {
+  name: string,
+  nu: string,
+  gender: Gender,
+}
+
 export type TestRecord = {
   id?: string,
   date: Date,
-  student: {
-    name: string,
-    nu: string,
-  },
+  student: Student,
   test: {
     score: string,
     type: TestType
@@ -108,10 +111,27 @@ export type Pagination = {
   done: boolean,
 }
 
+export enum ScoreType {
+  RealTime,
+  Final,
+  Unknow,
+}
+
+export type Score = {
+  type: ScoreType,
+  data: string,
+}
+
+export enum Gender {
+  Male = 1,
+  Female = 2,
+}
+
+
 export interface RecordService {
   init(): Promise<void>;
   getById(id: string): Promise<TestRecord>;
-  save(r: TestRecord): Promise<TestRecord>;
+  save(r: TestRecord[]): Promise<TestRecord[]>;
   searchStudent(keyword: string): Promise<{name: string, no: string}[]>;
   getByStudentNo(no: string, type: TestType, pagination: Pagination): Promise<TestRecord[]>;
   getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
@@ -121,4 +141,15 @@ export interface RecordService {
     host?: string,
     limit?: number,
   ): Promise<void>;
+}
+
+export interface DeviceManagerService {
+  searchRF(): Promise<boolean>;
+  close(): void;
+  getScore(device: string): Promise<null | Score>;
+  startTest(): Promise<null | true>;
+  endTest(): Promise<null | true>;
+  setTestType(type: TestType): Promise<null | true>;
+  getDeviceList(): Promise<string[]>;
+  getMaxDeviceNo(): Promise<string | null>;
 }

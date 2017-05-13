@@ -2,6 +2,7 @@ import React = require('react');
 require('./index.scss');
 type Props = {
   title?: string,
+  type?: string,
   onCancel: () => void,
   onConfirm: () => void,
   confirmText?: string,
@@ -15,6 +16,7 @@ export default class Dialog extends React.Component<Props, void> {
       confirmText,
       onConfirm,
       onCancel,
+      type,
     } = this.props;
 
     return <div className="dialog">
@@ -28,7 +30,8 @@ export default class Dialog extends React.Component<Props, void> {
           {children}
         </div>
         <div className="btn-group">
-          <button onClick={onConfirm}>{confirmText || '确认'}</button>
+          <button className="confirm" onClick={onConfirm}>{confirmText || '确认'}</button>
+          { type === 'confirmAndCancel' && <button className="cancel" onClick={onCancel}>取消</button>}
         </div>
       </div>
     </div>;
