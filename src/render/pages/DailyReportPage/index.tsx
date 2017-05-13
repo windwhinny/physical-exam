@@ -182,11 +182,14 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   }
 
   renderBottomAction() {
+    const { records } = this.props;
     const { updateProgress } = this.state;
     if (updateProgress.uploading) {
       return <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
-    } else {
+    } else if (records.length) {
       return <button className="sync" onClick={this.sync}>同步数据</button>
+    } else {
+      return null;
     }
   }
 

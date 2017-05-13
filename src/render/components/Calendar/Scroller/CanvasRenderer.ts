@@ -8,6 +8,7 @@ export type FrameOptions = {
   getDateSet: () => Date[],
   activeDate: Date,
   offset: number,
+  activeDates: [number, number, number][],
 }
 
 export type Cell = {
@@ -55,6 +56,14 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
     dates.forEach((d, i) => {
       let width = 0;
       let left = start;
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const date = d.getDate();
+      const active = !!frameOptions.activeDates.find(a =>
+        a[0] === year &&
+        a[1] === month &&
+        a[2] === date
+        );
       for (let [k, v] of layout.entries()) {
         if (k === i) {
           width = v;
@@ -65,6 +74,9 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
       const x = (left + width / 2) * this.scale;
       const y = 130 * this.scale;
       this.drawText(String(d.getDate()), x + offset, y);
+      if (active) {
+        this.drawCircle(x + offset, y - 30 * this.scale, 5 * this.scale);
+      }
       cells.push({
         date: d,
         x: x / (devicePixelRatio),

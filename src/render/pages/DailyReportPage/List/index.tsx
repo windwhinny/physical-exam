@@ -36,6 +36,7 @@ export default class extends React.Component<Props, void> {
   }
 
   componentDidMount() {
+    actions.DRPClear();
     this.fetch(this.props.date, Object.assign({}, this.props.pagination, {
       page: 1,
     }));

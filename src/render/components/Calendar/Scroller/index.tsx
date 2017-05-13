@@ -13,6 +13,8 @@ import {
 import {
   CommonCalendarProps,
 } from '../types';
+import RecordService from '../../../services/Record';
+
 require('./index.scss');
 
 type Props = CommonCalendarProps;
@@ -22,6 +24,10 @@ type State = {
   offset: number,
   current: Date,
   renderer?: CanvasRenderer,
+  activeDates: {
+    start: Date | null,
+    dates: [number, number, number][],
+  }
 }
 
 export default class CalendarScroler extends React.Component<Props, State> {
@@ -38,8 +44,15 @@ export default class CalendarScroler extends React.Component<Props, State> {
     this.state = {
       offset: 0,
       current: props.date,
+      activeDates: {
+        start: null,
+        dates: [],
+      }
     };
+
     this.resizeCallback = throttle(this.resizeCallback, 500);
+    this.getActiveDates = throttle(this.getActiveDates, 300);
+
     bindMethod(this, [
       'renderCanvas',
       'touchStart',
@@ -62,7 +75,29 @@ export default class CalendarScroler extends React.Component<Props, State> {
       d = new Date(d.getTime() + oneDay);
     }
 
+    const activeStart = this.state.activeDates.start;
+    if (activeStart && start.getTime() !== activeStart.getTime()) {
+      this.getActiveDates(dates);
+    } else if (!activeStart) {
+      this.getActiveDates(dates);
+    }
+
     return dates;
+  }
+
+  async getActiveDates(dates: Date[]) {
+    const from = dates[0];
+    const to = dates[dates.length - 1];
+    const rs = await RecordService('getByDateRange')(from, to);
+    this.setState({
+      activeDates: {
+        start: from,
+        dates: rs.map(s => {
+          const d = new Date(s);
+          return [d.getFullYear(), d.getMonth(), d.getDate()];
+        }) as [number, number, number][],
+      },
+    });
   }
 
   initCanvas() {
@@ -124,7 +159,7 @@ export default class CalendarScroler extends React.Component<Props, State> {
   }
 
   renderCanvas() {
-    const { renderer, offset } = this.state;
+    const { renderer, offset, activeDates} = this.state;
     const { date } = this.props;
     if (!this.refs.canvas) return;
     if (!renderer) {
@@ -135,6 +170,7 @@ export default class CalendarScroler extends React.Component<Props, State> {
       getDateSet: this.generateDates,
       activeDate: date,
       offset: offset * devicePixelRatio,
+      activeDates: activeDates.dates,
     });
   }
 

@@ -85,7 +85,14 @@ export default class extends React.Component<Props, State> {
     const timmer = setInterval(fn, 1000);
   }
 
-  endTest() {
+  async endTest() {
+    // 结束测试时，再获取一次成绩
+    await Promise.all(
+      this.props
+          .deviceList
+          .map(d => {
+            return actions.DRPGetScore(d.deviceNo).promise.originPromise;
+          }));
     actions.DRPEndTest();
   }
 
@@ -183,7 +190,7 @@ export default class extends React.Component<Props, State> {
       if (!deviceList.length) {
         return null
       } else if (status === 'idle') {
-        if (deviceList.find(d => !!d.score)) {
+        if (deviceList.find(d => !!d.score) && students.length) {
           return <button onClick={this.saveTest}>保存测试成绩</button>;
         } else if (students.length) {
           return <button onClick={this.startTest}>开始测试</button>
