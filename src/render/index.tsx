@@ -3,6 +3,7 @@ import ReactDOM = require('react-dom');
 import { AppContainer } from 'react-hot-loader';
 import { Provider } from 'react-redux';
 import store from './store';
+import electron = require('electron')
 
 function render() {
   const App = require('./App').default;
@@ -25,3 +26,7 @@ if ((module as any).hot) {
 render();
 
 document.title = '体育测试';
+
+document.addEventListener('keydown', () => {
+  electron.ipcRenderer.send('openDevTool');
+});

@@ -49,7 +49,6 @@ function electronBuild () {
       npmArgs: [
         '--production'
       ],
-      asar: false
     }
   })
 }

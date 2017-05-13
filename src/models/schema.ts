@@ -18,6 +18,7 @@ export const RecordModelSchema = {
   date: FieldType.TEXT,
   gender: FieldType.INTEGER,
   ip: FieldType.TEXT,
+  sign: FieldType.TEXT,
 }
 
 export type RecordPO = {
@@ -32,4 +33,5 @@ export type RecordPO = {
   date: string,
   gender: number,
   ip: string,
+  sign: string,
 }

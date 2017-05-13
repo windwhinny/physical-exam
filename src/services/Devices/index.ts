@@ -150,7 +150,9 @@ class DeviceConnector extends Event.EventEmitter {
 
   close() {
     if (this.closed) return;
-    this.port.close();
+    return new Promise((resolve) => {
+      this.port.close(resolve);
+    });
   }
 
   onClose() {
@@ -222,6 +224,11 @@ class DeviceConnector extends Event.EventEmitter {
 const manager = new DeviceManager();
 serviceIPCRegistor(manager, 'DeviceManager');
 
+export async function destory() {
+  if (!manager) return;
+  if (!manager.deviceCont) return;
+  await manager.deviceCont.close();
+}
 
 // async function test() {
 //   await manager.searchRF();

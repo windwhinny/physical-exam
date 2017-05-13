@@ -1,8 +1,8 @@
 import electron = require('electron');
 import path = require('path');
 import URL = require('url');
-import './services/Record';
-import './services/Devices';
+import { destory as RecordDestory } from './services/Record';
+import { destory as DevicesDestory} from './services/Devices';
 
 const app = electron.app;
 const isDev = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
@@ -12,6 +12,17 @@ function createWindow(url: string) {
     height: 1024,
   });
   mainWindow.loadURL(url);
+  mainWindow.on('closed', async () => {
+    await Promise.all<void>([
+      RecordDestory(),
+      DevicesDestory(),
+    ]);
+    app.quit();
+    process.exit(0);
+  });
+  electron.ipcMain.on('openDevTool', () => {
+    mainWindow.webContents.openDevTools();
+  });
   if (isDev) {
     const installExtension = require('electron-devtools-installer');
     const { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } = installExtension;
@@ -36,8 +47,4 @@ app.on('ready', () => {
       pathname: path.join(__dirname, 'index.html'),
     }))
   }
-});
-app.on('all-window-closed', () => {
-  console.log('QUIT');
-  app.quit()
 });

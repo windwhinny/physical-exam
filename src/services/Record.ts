@@ -21,7 +21,7 @@ import {
 import serviceIPCRegistor from './registor';
 
 class RecordService implements RecordServiceInterface {
-  private model: RecordModel;
+   model: RecordModel;
   async init() {
     if (this.model) return;
     const db = new DB();
@@ -49,6 +49,7 @@ class RecordService implements RecordServiceInterface {
       date: getDateString(date),
       gender: r.student.gender,
       ip: r.user.ip,
+      sign: '',
     }
   }
 
@@ -247,3 +248,7 @@ class RecordService implements RecordServiceInterface {
 const recordService = new RecordService();
 serviceIPCRegistor(recordService, 'RecordService');
 export default recordService;
+
+export function destory() {
+  return recordService.model.db.close();
+}
