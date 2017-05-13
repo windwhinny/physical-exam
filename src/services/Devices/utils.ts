@@ -1,4 +1,7 @@
 import SerialPort = require('serialport');
+import {
+  TestType,
+} from '../../constants';
 
 export type Frame = {
   cmd: string,
@@ -86,4 +89,25 @@ export function compareArray<T>(array1: T[], array2: T[]): boolean {
 
 export function asciiToString(n: number[]): string {
   return Buffer.from(n).toString('ascii');
+}
+
+function timeStr(str: string): string {
+  const min = Number(str.slice(0, 2));
+  const sec = Number(str.slice(2, 4));
+  const minSec = Number(str.slice(4));
+  return `${min}'${sec}''${minSec}`;
+}
+
+export function transformScore(type: TestType, data: string): string {
+  switch (type) {
+    case TestType.Running1000:
+    case TestType.Running800:
+      return `${Number(data.slice(0, 2))},${timeStr(data.slice(2))}`;
+    case TestType.RunningBackAndForth:
+      return `${Number(data.slice(0, 2))},${Number(data.slice(2, 4))},${timeStr(data.slice(4))}`;
+    case TestType.HeightAndWeight:
+      return `${Number(data.slice(0, 6))},${Number(data.slice(6))}`;
+    default:
+      return String(Number(data));
+  }
 }

@@ -3,6 +3,7 @@ import {
   TestType,
   Gender,
   TestRecord,
+  Score,
 } from '../../../../constants';
 import actions from '../../../actions';
 import {
@@ -13,11 +14,12 @@ import {
   TestState,
   TestDevice,
 } from '../../../reducers/dailyReportPage';
-import Score from '../../../components/Score';
+import ScoreComponent from '../../../components/Score';
 import Dialog from '../../../components/Dialog';
 
 export type Props = {
   type: TestType,
+  ip: string,
 } & TestState;
 
 type State = {
@@ -30,7 +32,12 @@ export default class extends React.Component<Props, State> {
     this.state = {
       confirmRemoveIndex: null,
     };
-    bindMethod(this, ['renderDevice', 'startTest', 'endTest', 'saveTest']);
+    bindMethod(this, [
+      'renderDevice',
+      'startTest',
+      'endTest',
+      'saveTest',
+      'startNextRound']);
   }
 
   componentDidMount() {
@@ -44,11 +51,12 @@ export default class extends React.Component<Props, State> {
     });
   }
 
-  saveTest() {
+  genRecords() {
     const {
       deviceList,
       students,
       type,
+      ip,
     } = this.props;
     const records = deviceList.map((d, index) => {
       if (!d.score) return null;
@@ -60,15 +68,37 @@ export default class extends React.Component<Props, State> {
         test: {
           score: d.score.data,
           type,
-        }
+        },
+        user: { ip },
       }
     }).filter(Boolean) as TestRecord[];
-    actions.DRPSaveTestResult(records);
+    return records;
+  }
+
+  saveTest() {
+    actions.DRPSaveTestResult(this.genRecords());
+  }
+
+  async startNextRound() {
+    const { deviceList } = this.props;
+    const temp = deviceList.map(d => {
+      if (!d.score) return null;
+      return {
+        deviceNo: d.deviceNo,
+        score: d.score,
+      };
+    }).filter(Boolean) as {
+      deviceNo: string,
+      score: Score,
+    }[];
+    actions.DRPSaveTempScore(temp);
+    this.startTest();
   }
 
   async startTest() {
     const {
       deviceList,
+      type,
     } = this.props;
     await actions.DRPStartTest().promise.originPromise;
     const fn = () => {
@@ -78,7 +108,7 @@ export default class extends React.Component<Props, State> {
         return;
       }
       deviceList.forEach(device => {
-        actions.DRPGetScore(device.deviceNo);
+        actions.DRPGetScore(type, device.deviceNo);
       });
     };
 
@@ -86,14 +116,17 @@ export default class extends React.Component<Props, State> {
   }
 
   async endTest() {
+    const { type } = this.props;
     // 结束测试时，再获取一次成绩
     await Promise.all(
       this.props
           .deviceList
           .map(d => {
-            return actions.DRPGetScore(d.deviceNo).promise.originPromise;
+            return actions.DRPGetScore(type, d.deviceNo).promise.originPromise;
           }));
-    actions.DRPEndTest();
+    requestAnimationFrame(() => {
+      actions.DRPEndTest(type);
+    });
   }
 
   renderDevice(device: TestDevice, index: number) {
@@ -103,7 +136,7 @@ export default class extends React.Component<Props, State> {
       const { score } = device;
       if (status === 'testing' || score) {
         return <div className="testing">
-          {score && <Score data={score.data} type={type}/>}
+          {score && <ScoreComponent data={score.data} type={type}/>}
           {status === 'testing' && <div className="status">测试中</div>}
         </div>;
       } else if (!student) {
@@ -185,12 +218,16 @@ export default class extends React.Component<Props, State> {
       status,
       deviceList,
       students,
+      type,
+      round,
     } = this.props;
     const renderButton = () => {
       if (!deviceList.length) {
         return null
       } else if (status === 'idle') {
-        if (deviceList.find(d => !!d.score) && students.length) {
+        if (type === TestType.VitalCapacity && round === 1) {
+          return <button onClick={this.startNextRound}>开始二轮测试</button>;
+        } else if (deviceList.find(d => !!d.score) && students.length) {
           return <button onClick={this.saveTest}>保存测试成绩</button>;
         } else if (students.length) {
           return <button onClick={this.startTest}>开始测试</button>

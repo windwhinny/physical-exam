@@ -6,6 +6,7 @@ import {
   receiveFrame,
   Frame,
   asciiToString,
+  transformScore,
 } from './utils';
 import {
   TestType,
@@ -46,7 +47,7 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
     this.deviceCont = null;
   }
 
-  async getScore(device: string): Promise<null | Score> {
+  async getScore(testType: TestType, device: string): Promise<null | Score> {
     if (!this.deviceCont) return null;
     const f = await this.deviceCont.sendAndAwait(
       'TK',
@@ -65,7 +66,7 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
 
     return {
       type,
-      data: asciiToString(f.data.slice(5, f.data.length)),
+      data: transformScore(testType, asciiToString(f.data.slice(5, f.data.length))),
     }
   }
 

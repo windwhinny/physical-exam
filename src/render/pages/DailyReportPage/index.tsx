@@ -255,13 +255,14 @@ export default connect((state: RootState) => {
   const location = state.routing.location
   if (location) {
     const path = url.parse(location.search, true);
-    testType = path.query.item;
+    testType = Number(path.query.item);
   }
   return Object.assign({}, state.dailyReportPage, {
     date: state.selectedDate,
     type: testType,
     test: Object.assign({}, state.dailyReportPage.test, {
       type: testType,
+      ip: state.user ? state.user.ip : '0.0.0.0',
     }),
   });
 })(DailyReportPage);

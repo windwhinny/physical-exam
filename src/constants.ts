@@ -61,15 +61,15 @@ export const TestName = {
 
 export const TestUnitTemp = {
   [TestType.Running50]: '$0 秒',
-  [TestType.Running800]: '$0 秒',
-  [TestType.Running1000]: '$0 秒',
-  [TestType.RopeSkipping]: '$0 cm',
+  [TestType.Running800]: '$1 秒',
+  [TestType.Running1000]: '$1 秒',
+  [TestType.RopeSkipping]: '$0 次',
   [TestType.Situps]: '$0 次',
   [TestType.StandingLongJump]: '$0 cm',
   [TestType.VitalCapacity]: '$0 ml',
   [TestType.SitAndReach]: '$0 cm',
   [TestType.PullUp]: '$0 次',
-  [TestType.RunningBackAndForth]: '$0 秒',
+  [TestType.RunningBackAndForth]: '$2 秒',
   [TestType.HeightAndWeight]: '$0 cm, $1 kg',
   [TestType.MedicineBall]: '$0 米',
 }
@@ -102,6 +102,9 @@ export type TestRecord = {
   test: {
     score: string,
     type: TestType
+  },
+  user: {
+    ip: string,
   }
 }
 
@@ -146,7 +149,7 @@ export interface RecordService {
 export interface DeviceManagerService {
   searchRF(): Promise<boolean>;
   close(): void;
-  getScore(device: string): Promise<null | Score>;
+  getScore(type: TestType, device: string): Promise<null | Score>;
   startTest(): Promise<null | true>;
   endTest(): Promise<null | true>;
   setTestType(type: TestType): Promise<null | true>;

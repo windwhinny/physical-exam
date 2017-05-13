@@ -18,6 +18,8 @@ import {
   DRP_CLEAR_ERROR,
   DRP_SAVE_TEST_RESULT,
   DRPSaveTestResultAction,
+  DRP_SAVE_TEMP_SCORE,
+  DRPSaveTempScoreAction,
 } from '../actions/dailyReportPage';
 import {
   defaultPagination,
@@ -27,6 +29,7 @@ import {
   Pagination,
   Student,
   Score,
+  TestType,
 } from '../../constants';
 import handlePromise from './handlePromise';
 
@@ -38,9 +41,14 @@ export type TestDevice = {
 export type TestState = {
   deviceList: TestDevice[],
   students: (Student | null)[],
+  tempRecords: {
+    deviceNo: string,
+    score: Score,
+  }[],
   pending: boolean,
   error: Error | null,
   status: string,
+  round: number,
 }
 export type DailyReportPageState = {
   records: TestRecord[],
@@ -56,6 +64,8 @@ const defaultTestState = {
   pending: false,
   error: null,
   status: 'idle',
+  round: 0,
+  tempRecords: [],
 }
 
 const defaultState = {
@@ -85,7 +95,8 @@ const testReducer = (
     DRPStartTestAction |
     DRPEndTestAction |
     DRPGetScoreAction |
-    DRPSaveTestResultAction
+    DRPSaveTestResultAction |
+    DRPSaveTempScoreAction
 ) => {
   switch (action.type) {
     case DRP_CLEAR_TEST: {
@@ -126,6 +137,8 @@ const testReducer = (
         case 'resolved':
           return Object.assign({}, state, {
             status: 'testing',
+            round: state.round + 1,
+            tempRecords: state.round === 0 ? [] : state.tempRecords,
           });
         case 'rejected':
           return Object.assign({}, state, {
@@ -135,15 +148,40 @@ const testReducer = (
       }
     }
     case DRP_END_TEST: {
-      const ac = action as DRPStartTestAction;
+      const ac = action as DRPEndTestAction;
       switch (ac.promise.status) {
         case 'pending':
           return Object.assign({}, state, {
             status: 'pending',
           });
         case 'resolved':
+          /*
+            肺活量测试需要有两轮测试，
+            所以在结束测试的时候，将两轮测试成绩合并，取最优的成绩
+          */
+          const round = ac.testType !== TestType.VitalCapacity || state.round === 2 ? 0 : state.round;
+          let deviceList = state.deviceList;
+          if (round === 0 && ac.testType === TestType.VitalCapacity) {
+            deviceList = state.deviceList.map(device => {
+              const temp = state.tempRecords.find(d => d.deviceNo === device.deviceNo);
+              if (!temp) return device;
+              if (!device.score) {
+                return Object.assign({}, device, {
+                  score: temp.score,
+                });
+              } else if (Number(temp.score.data) > Number(device.score.data)) {
+                return Object.assign({}, device, {
+                  score: temp.score,
+                });
+              }
+              return device;
+            });
+          }
           return Object.assign({}, state, {
             status: 'idle',
+            round,
+            tempRecords: round === 0 ? [] : state.tempRecords,
+            deviceList,
           });
         case 'rejected':
           return Object.assign({}, state, {
@@ -189,6 +227,12 @@ const testReducer = (
             status: 'idle',
           });
       }
+    }
+    case DRP_SAVE_TEMP_SCORE: {
+      const ac = action as DRPSaveTempScoreAction;
+      return Object.assign({}, state, {
+        tempRecords: state.tempRecords.concat(ac.records),
+      })
     }
   }
   return state;

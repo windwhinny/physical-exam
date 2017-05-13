@@ -9,6 +9,7 @@ import {
   TestType,
   Student,
   TestRecord,
+  Score,
 } from '../../constants';
 
 export const DRP_LOAD_RECORDS = 'DRP_LOAD_RECORDS';
@@ -94,20 +95,21 @@ const DRPStartTestRV = getReturnVal(DRPStartTest);
 export type DRPStartTestAction = typeof DRPStartTestRV;
 
 export const DRP_END_TEST = 'DRP_END_TEST';
-export const DRPEndTest = () => {
+export const DRPEndTest = (type: TestType) => {
   return {
     type: DRP_END_TEST,
     promise: new ActionPromise(Device('endTest')()),
+    testType: type,
   }
 };
 const DRPEndTestRV = getReturnVal(DRPEndTest);
 export type DRPEndTestAction = typeof DRPEndTestRV;
 
 export const DRP_GET_SCORE = 'DRP_GET_SCORE';
-export const DRPGetScore = (deviceNo: string) => {
+export const DRPGetScore = (type: TestType, deviceNo: string) => {
   return {
     type: DRP_GET_SCORE,
-    promise: new ActionPromise(Device('getScore')(deviceNo)),
+    promise: new ActionPromise(Device('getScore')(type, deviceNo)),
     deviceNo,
   }
 };
@@ -130,3 +132,14 @@ export const DRPSaveTestResult = (records: TestRecord[]) => {
 };
 const DRPSaveTestResultRV = getReturnVal(DRPSaveTestResult);
 export type DRPSaveTestResultAction = typeof DRPSaveTestResultRV;
+
+export const DRP_SAVE_TEMP_SCORE = 'DRP_SAVE_TEMP_SCORE';
+export const DRPSaveTempScore = (records: {
+  deviceNo: string,
+  score: Score,
+}[]) => ({
+  type: DRP_SAVE_TEMP_SCORE,
+  records,
+});
+const DRPSaveTempScoreRV = getReturnVal(DRPSaveTempScore);
+export type DRPSaveTempScoreAction = typeof DRPSaveTempScoreRV;

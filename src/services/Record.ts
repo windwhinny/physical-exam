@@ -47,7 +47,8 @@ class RecordService implements RecordServiceInterface {
       testTime: date,
       synced: 0,
       date: getDateString(date),
-      gendar: r.student.gender,
+      gender: r.student.gender,
+      ip: r.user.ip,
     }
   }
 
@@ -61,11 +62,14 @@ class RecordService implements RecordServiceInterface {
       student: {
         name: r.stuName,
         nu: r.stuNo,
-        gender: r.gendar,
+        gender: r.gender,
       },
       test: {
         score: r.score,
         type: type ? Number(type) as TestType : TestType.Unknow,
+      },
+      user: {
+        ip: r.ip,
       },
     };
   }
@@ -176,7 +180,7 @@ class RecordService implements RecordServiceInterface {
   ): Promise<void> {
     const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
     let proccessed = 0;
-    if (total) return;
+    if (!total) return;
     const get = () => this.model.find({
         where: {
           synced: 0,

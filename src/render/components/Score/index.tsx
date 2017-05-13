@@ -1,5 +1,5 @@
 import React = require('react');
-
+import './index.scss';
 import {
   TestType,
   TestUnitTemp,
@@ -21,7 +21,7 @@ export default class Score extends React.Component<Props, void> {
   }
 
   render() {
-    return <div className="score">
+    return <div className="score-component">
       <div className="value">{this.getScoreDesc()}</div>
     </div>;
   }
