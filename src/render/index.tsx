@@ -28,12 +28,14 @@ render();
 
 document.title = '体育测试';
 
-document.addEventListener('keydown', () => {
-  electron.ipcRenderer.send('openDevTool');
+document.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.code === 'F12') {
+    electron.ipcRenderer.send('openDevTool');
+  }
 });
 
 function setRem() {
-  const rem = window.screen.availWidth * 75 / 800;
+  const rem = document.documentElement.clientWidth * 75 / 800;
   document.documentElement.style.fontSize = `${rem}px`;
 }
 

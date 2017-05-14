@@ -12,17 +12,13 @@ function createWindow(url: string) {
     height?: number,
     width?: number,
     fullscreen?: boolean,
+    maxWidth?: number,
+    title?: string,
+    zoomToPageWidth?: boolean,
+  } = {
+    width: display.workAreaSize.width > 800 ? 800 : display.workAreaSize.width,
+    height: display.workAreaSize.height > 1280 ? 1280 : display.workAreaSize.height,
   };
-  if (display.workAreaSize.width < 800) {
-    options = {
-      fullscreen: true,
-    }
-  } else {
-    options = {
-      width: 800,
-      height: display.workAreaSize.height > 1280 ? 1280 : display.workAreaSize.height,
-    }
-  }
   const mainWindow = new electron.BrowserWindow(options);
   mainWindow.loadURL(url);
   mainWindow.on('closed', async () => {
