@@ -7,10 +7,23 @@ import { destory as DevicesDestory} from './services/Devices';
 const app = electron.app;
 const isDev = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
 function createWindow(url: string) {
-  const mainWindow = new electron.BrowserWindow({
-    width: 760,
-    height: 1024,
-  });
+  const display = electron.screen.getAllDisplays()[0];
+  let options: {
+    height?: number,
+    width?: number,
+    fullscreen?: boolean,
+  };
+  if (display.workAreaSize.width < 800) {
+    options = {
+      fullscreen: true,
+    }
+  } else {
+    options = {
+      width: 800,
+      height: display.workAreaSize.height > 1280 ? 1280 : display.workAreaSize.height,
+    }
+  }
+  const mainWindow = new electron.BrowserWindow(options);
   mainWindow.loadURL(url);
   mainWindow.on('closed', async () => {
     await Promise.all<void>([

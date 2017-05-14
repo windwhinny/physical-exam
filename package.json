@@ -13,6 +13,7 @@
   "dependencies": {
     "classnames": "^2.2.5",
     "node-serial": "^0.1.1",
+    "postcss-px2rem": "^0.3.0",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-redux": "^5.0.4",

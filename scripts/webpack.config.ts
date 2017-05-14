@@ -2,6 +2,7 @@ import webpack = require('webpack');
 import path = require('path');
 import config = require('config');
 import TSLoader = require('awesome-typescript-loader');
+const px2rem = require('postcss-px2rem');
 const root = config.get('root') as string;
 const publicPath = 'http://localhost:8080/'
 export default {
@@ -50,6 +51,7 @@ export default {
                 reduceIdents: false,
                 safe: true,
               }),
+              px2rem({remUnit: 75})
             ]
           }
         },
