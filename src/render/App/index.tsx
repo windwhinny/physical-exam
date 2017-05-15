@@ -11,7 +11,7 @@ import DailyReportPage from '../pages/DailyReportPage';
 import CalendarPage from '../pages/CalendarPage';
 import { history } from '../store';
 import actions from '../actions';
-import store from '../store';
+import LoginPage from '../pages/LoginPage';
 import { connect } from 'react-redux';
 import {
   State as RootState,
@@ -21,7 +21,10 @@ require('./index.scss');
 
 type State = { };
 type Props = {
-  inited: boolean
+  inited: boolean,
+  user: {
+    ip: string,
+  } | null,
 };
 
 class App extends React.Component<Props, State> {
@@ -30,8 +33,12 @@ class App extends React.Component<Props, State> {
   }
 
   render() {
-    if (!store.getState().app.inited) {
+    const { inited, user } = this.props;
+    if (!inited) {
       return null;
+    }
+    if (!user) {
+      return <LoginPage />;
     }
     return <ConnectedRouter  history={history}>
       <div id="routes">
@@ -45,8 +52,7 @@ class App extends React.Component<Props, State> {
     </ConnectedRouter >;
   }
 }
-
-
 export default connect((state: RootState) => ({
   inited: state.app.inited,
+  user: state.user,
 }))(App);

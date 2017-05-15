@@ -7,8 +7,12 @@ export type UserState = null | {
   ip: string
 }
 
+const defaultUserState = {
+  ip: '1.1.1.1',
+}
+
 export default function(
-  user: UserState = null,
+  user: UserState = defaultUserState,
   action: LoginOrLogoutAction): UserState {
   switch (action.type) {
     case LOGIN_OR_LOGOUT:
