@@ -7,7 +7,7 @@ import {
   getDateString,
   oneDay,
 } from '../lib/date';
-import RecordModel, { RecordPO } from '../models/Record'
+import RecordModel, { RecordPO, RecordModelSchema } from '../models/Record'
 import {
   WhereCondition,
 } from '../definitions/sql';
@@ -20,6 +20,7 @@ import {
 } from '../constants';
 import serviceIPCRegistor from './registor';
 
+const fields = Object.keys(RecordModelSchema).filter(a => a === 'sign');
 class RecordService implements RecordServiceInterface {
    model: RecordModel;
   async init() {
@@ -49,7 +50,7 @@ class RecordService implements RecordServiceInterface {
       date: getDateString(date),
       gender: r.student.gender,
       ip: r.user.ip,
-      sign: '',
+      sign: r.sign as string,
     }
   }
 
@@ -80,6 +81,7 @@ class RecordService implements RecordServiceInterface {
       where: {
         uuid: id,
       },
+      attrs: fields,
     }) as RecordPO;
     return this.reverse(po);
   }
@@ -125,6 +127,7 @@ class RecordService implements RecordServiceInterface {
       },
       limit: pagination.limit,
       offset: (pagination.page - 1) * pagination.limit,
+      attrs: fields,
     }) as RecordPO[];
     return rs.map(this.reverse);
   }
@@ -170,6 +173,7 @@ class RecordService implements RecordServiceInterface {
       where: query,
       limit: pagination.limit,
       offset: (pagination.page - 1) * pagination.limit,
+      attrs: fields,
     }) as RecordPO[];
     return rs.map(this.reverse);
   }

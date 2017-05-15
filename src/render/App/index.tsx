@@ -29,7 +29,7 @@ type Props = {
 
 class App extends React.Component<Props, State> {
   componentDidMount() {
-    actions.initApp();
+    actions.AppInit();
   }
 
   render() {

@@ -180,7 +180,7 @@ export default class Model extends BaseModel {
       field: string,
       order: Order,
     },
-    attrs?: string,
+    attrs?: string[],
   }, t?: DBTransaction): Promise<SimpleObject | null> {
     return this.find(Object.assign({}, options, {
       limit: 1,

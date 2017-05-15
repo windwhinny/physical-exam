@@ -263,6 +263,7 @@ export default connect((state: RootState) => {
     test: Object.assign({}, state.dailyReportPage.test, {
       type: testType,
       ip: state.user ? state.user.ip : '0.0.0.0',
+      mode: state.app.mode,
     }),
   });
 })(DailyReportPage);

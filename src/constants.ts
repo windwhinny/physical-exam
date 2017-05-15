@@ -105,7 +105,8 @@ export type TestRecord = {
   },
   user: {
     ip: string,
-  }
+  },
+  sign?: string,
 }
 
 export type Pagination = {

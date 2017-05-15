@@ -4,6 +4,7 @@ import {
   Gender,
   TestRecord,
   Score,
+  Student,
 } from '../../../../constants';
 import actions from '../../../actions';
 import {
@@ -16,10 +17,11 @@ import {
 } from '../../../reducers/dailyReportPage';
 import ScoreComponent from '../../../components/Score';
 import Dialog from '../../../components/Dialog';
-
+import SignBoard from './SignBoard';
 export type Props = {
   type: TestType,
   ip: string,
+  mode: string,
 } & TestState;
 
 type State = {
@@ -58,6 +60,8 @@ export default class extends React.Component<Props, State> {
       type,
       ip,
     } = this.props;
+    const signBoard = this.refs.signBoard as SignBoard;
+    const signs = signBoard.getSigns();
     const records = deviceList.map((d, index) => {
       if (!d.score) return null;
       const student = students[index];
@@ -70,6 +74,7 @@ export default class extends React.Component<Props, State> {
           type,
         },
         user: { ip },
+        sign: signs[student.nu],
       }
     }).filter(Boolean) as TestRecord[];
     return records;
@@ -220,6 +225,7 @@ export default class extends React.Component<Props, State> {
       students,
       type,
       round,
+      mode,
     } = this.props;
     const renderButton = () => {
       if (!deviceList.length) {
@@ -228,7 +234,14 @@ export default class extends React.Component<Props, State> {
         if (type === TestType.VitalCapacity && round === 1) {
           return <button onClick={this.startNextRound}>开始二轮测试</button>;
         } else if (deviceList.find(d => !!d.score) && students.length) {
-          return <button onClick={this.saveTest}>保存测试成绩</button>;
+          if (mode === 'normal') {
+            return <button onClick={this.saveTest}>保存测试成绩</button>;
+          } else {
+            return [
+              <SignBoard students={students.filter(Boolean) as Student[]} ref="signBoard" key={1}/>,
+              <button onClick={this.saveTest} key={2}>保存测试成绩</button>
+            ];
+          }
         } else if (students.length) {
           return <button onClick={this.startTest}>开始测试</button>
         } else {
