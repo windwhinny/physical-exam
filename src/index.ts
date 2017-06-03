@@ -3,6 +3,7 @@ import path = require('path');
 import URL = require('url');
 import { destory as RecordDestory } from './services/Record';
 import { destory as DevicesDestory} from './services/Devices';
+import { destory as CardReaderDestory } from './services/CardReader';
 
 const app = electron.app;
 const isDev = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
@@ -25,6 +26,7 @@ function createWindow(url: string) {
     await Promise.all<void>([
       RecordDestory(),
       DevicesDestory(),
+      CardReaderDestory(),
     ]);
     app.quit();
     process.exit(0);

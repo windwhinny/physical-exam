@@ -2,3 +2,5 @@ node_modules
 *.js
 *.js.map
 dist
+sdk/SDKLog/*
+sdk/log/**/*

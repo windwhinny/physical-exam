@@ -20,7 +20,7 @@ import {
 } from '../constants';
 import serviceIPCRegistor from './registor';
 
-const fields = Object.keys(RecordModelSchema).filter(a => a === 'sign');
+const fields = Object.keys(RecordModelSchema).filter(a => a !== 'sign');
 class RecordService implements RecordServiceInterface {
    model: RecordModel;
   async init() {
@@ -180,7 +180,7 @@ class RecordService implements RecordServiceInterface {
 
   async sync(
     onProgress: (t: number, c: number) => void,
-    host: string = 'http://47.93.230.19:8080/score/saves',
+    host: string,
     limit: number = 5,
   ): Promise<void> {
     const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
@@ -200,7 +200,7 @@ class RecordService implements RecordServiceInterface {
         uuid: { $in: data.map(d => d.uuid as string)},
       });
     };
-
+    const url = `http://${host}/score/saves`;
     const fetch = (data: RecordPO[]) =>
       new Promise((resolve, reject) => {
         const body = (data.map(d => Object.assign({}, d, {
@@ -209,7 +209,7 @@ class RecordService implements RecordServiceInterface {
           synced: undefined,
         })));
         request({
-          url: host,
+          url,
           method: 'POST',
           headers: {
             'Content-type': 'application/json',

@@ -109,12 +109,15 @@ const testReducer = (
     case DRP_ADD_STUDENT: {
       const ac = action as DRPAddStudentAction;
       const students = state.students.slice();
+      const exists = students.find(s => s ? s.nu === ac.student.nu : false)
+      if (exists) return state;
       const index = students.indexOf(null);
       if (index > -1) {
         students[index] = ac.student;
       } else {
         students.push(ac.student);
       }
+      if (students.length > state.deviceList.length) return state;
       return Object.assign({}, state, { students })
     }
     case DRP_CLEAR_TEST_BY_INDEX: {

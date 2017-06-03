@@ -142,7 +142,7 @@ export interface RecordService {
   getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(
     onProgress: (t: number, c: number) => void,
-    host?: string,
+    host: string,
     limit?: number,
   ): Promise<void>;
 }
@@ -156,4 +156,9 @@ export interface DeviceManagerService {
   setTestType(type: TestType): Promise<null | true>;
   getDeviceList(): Promise<string[]>;
   getMaxDeviceNo(): Promise<string | null>;
+}
+
+export interface CardReaderService {
+  read(pin: string, cb: (student: Student) => void): Promise<void>;
+  stopRead(): void;
 }

@@ -13,6 +13,7 @@ export default (service: any, serviceName: string) =>
         if (Array.isArray(arg) && arg[0] === 'IPC-CALLBACK') {
           // tslint:disable-next-line:no-any
           return (...subargs: any[]) => {
+            console.log('CALLBACK:', serviceName, name, arg[1], result);
             event.sender.send(`${serviceName}:${name}:callback`, id, arg[1], subargs);
           };
         }
@@ -33,6 +34,7 @@ export default (service: any, serviceName: string) =>
         }
         return;
       }
+      console.log('RESOLVE:', serviceName, name, result);
       event.sender.send(`${serviceName}:${name}:resolve`, id, result);
     });
   });

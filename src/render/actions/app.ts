@@ -19,3 +19,11 @@ export const AppChangeMode = (mode: string) => ({
 });
 const AppChangeModeRV = getReturnVal(AppChangeMode);
 export type AppChangeModeAction = typeof AppChangeModeRV;
+
+export const APP_UPDATE_PIN_CODE = 'APP_UPDATE_PIN_CODE';
+export const AppUpdatePinCode = (pinCode: string) => ({
+  type: APP_UPDATE_PIN_CODE,
+  pinCode,
+});
+const AppUpdatePinCodeRV = getReturnVal(AppUpdatePinCode);
+export type AppUpdatePinCodeAction = typeof AppUpdatePinCodeRV;

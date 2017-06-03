@@ -18,10 +18,12 @@ import {
 import ScoreComponent from '../../../components/Score';
 import Dialog from '../../../components/Dialog';
 import SignBoard from './SignBoard';
+import CardReader from '../../../services/CardReader';
 export type Props = {
   type: TestType,
-  ip: string,
+  ip: string | null,
   mode: string,
+  pinCode: string | null,
 } & TestState;
 
 type State = {
@@ -29,6 +31,7 @@ type State = {
 };
 
 export default class extends React.Component<Props, State> {
+  readingCard = false;
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -42,9 +45,34 @@ export default class extends React.Component<Props, State> {
       'startNextRound']);
   }
 
+  componentWillUnmount( ) {
+    if (!this.readingCard) return;
+    this.readingCard = false;
+    CardReader('stopRead')();
+  }
+
   componentDidMount() {
     actions.DRPClearTest();
     actions.DRPSearchDevices(this.props.type);
+  }
+
+  componentWillReceiveProps(props: Props) {
+    switch (props.status) {
+      case 'idle': {
+        if (this.readingCard) break;
+        this.readingCard = true;
+        if (props.pinCode) {
+          CardReader('read')(props.pinCode, student => actions.DRPAddStudent(student));
+        }
+        break;
+      }
+      default: {
+        if (!this.readingCard) break;
+        this.readingCard = false;
+        CardReader('stopRead')();
+        break;
+      }
+    }
   }
 
   confirmRemove(index: number) {
@@ -60,8 +88,11 @@ export default class extends React.Component<Props, State> {
       type,
       ip,
     } = this.props;
-    const signBoard = this.refs.signBoard as SignBoard;
-    const signs = signBoard.getSigns();
+    let signs: {[k: string]: string} | null = null;
+    if (this.refs.signBoard) {
+      const signBoard = this.refs.signBoard as SignBoard;
+      signs = signBoard.getSigns();
+    }
     const records = deviceList.map((d, index) => {
       if (!d.score) return null;
       const student = students[index];
@@ -74,7 +105,7 @@ export default class extends React.Component<Props, State> {
           type,
         },
         user: { ip },
-        sign: signs[student.nu],
+        sign: signs ? signs[student.nu] : '',
       }
     }).filter(Boolean) as TestRecord[];
     return records;

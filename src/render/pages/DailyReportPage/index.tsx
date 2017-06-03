@@ -34,6 +34,7 @@ type Props = RouteComponentProps<{}> & {
   pending: boolean,
   test: TestProps,
   type: TestType,
+  ip: string | null,
   error: Error | null,
 };
 
@@ -101,6 +102,8 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   }
 
   async sync() {
+    const { ip } = this.props;
+    if (!ip) return;
     let { updateProgress } = this.state;
     updateProgress = Object.assign({}, updateProgress, {
       uploading: true,
@@ -114,7 +117,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
           processed: c,
         });
         this.setState({ updateProgress })
-      });
+      }, ip);
     } catch (e) {
       updateProgress = Object.assign({}, updateProgress, {
         error: true,
@@ -182,12 +185,16 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   }
 
   renderBottomAction() {
-    const { records } = this.props;
+    const { records, ip } = this.props;
     const { updateProgress } = this.state;
     if (updateProgress.uploading) {
       return <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
     } else if (records.length) {
-      return <button className="sync" onClick={this.sync}>同步数据</button>
+      if (!ip) {
+        return <button className="sync" disabled>未设置 IP，暂不能上传</button>
+      } else {
+        return <button className="sync" onClick={this.sync}>同步数据</button>
+      }
     } else {
       return null;
     }
@@ -260,9 +267,11 @@ export default connect((state: RootState) => {
   return Object.assign({}, state.dailyReportPage, {
     date: state.selectedDate,
     type: testType,
+    ip: state.user ? state.user.ip : null,
     test: Object.assign({}, state.dailyReportPage.test, {
+      pinCode: state.app.pinCode,
       type: testType,
-      ip: state.user ? state.user.ip : '0.0.0.0',
+      ip: state.user ? state.user.ip : null,
       mode: state.app.mode,
     }),
   });

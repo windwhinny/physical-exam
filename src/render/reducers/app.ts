@@ -2,6 +2,8 @@ import {
   AppInit,
   APP_INIT,
   APP_CHANGE_MODE,
+  APP_UPDATE_PIN_CODE,
+  AppUpdatePinCodeAction,
   AppChangeModeAction,
 } from '../actions/app';
 import {
@@ -13,6 +15,7 @@ export type AppState = {
   pending: boolean,
   inited: boolean,
   mode: string,
+  pinCode: string | null,
 }
 
 export default function(
@@ -20,8 +23,9 @@ export default function(
     pending: true,
     inited: false,
     mode: localStorage.getItem('mode') || 'normal',
+    pinCode: localStorage.getItem('pin-code') || null,
   },
-  action: typeof loginOrLogoutAction | AppChangeModeAction): AppState {
+  action: typeof loginOrLogoutAction | AppChangeModeAction | AppUpdatePinCodeAction): AppState {
   switch (action.type) {
     case APP_INIT: {
       const ac = action as typeof loginOrLogoutAction;
@@ -42,6 +46,13 @@ export default function(
             inited: false,
           });
       }
+    }
+    case APP_UPDATE_PIN_CODE: {
+      const ac = action as AppUpdatePinCodeAction;
+      localStorage.setItem('pin-code', ac.pinCode);
+      return Object.assign({}, state, {
+        pinCode: ac.pinCode,
+      });
     }
     case APP_CHANGE_MODE: {
       const ac = action as AppChangeModeAction;
