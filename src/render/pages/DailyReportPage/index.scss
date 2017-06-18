@@ -134,6 +134,9 @@
     overflow-y: auto;
   }
   .sync {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 0;
     height: 90px;
     font-size: 30px;

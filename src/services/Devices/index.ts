@@ -123,7 +123,7 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
 
 class DeviceConnector extends Event.EventEmitter {
   port: SerialPort;
-  initPromise: Promise<void>;
+  initPromise: Promise<{}>;
   closed: boolean = false;
   constructor(port: SerialPort) {
     super();
@@ -142,7 +142,7 @@ class DeviceConnector extends Event.EventEmitter {
       });
       // tslint:disable-next-line:no-any
       (port as any).once('open', onOpen);
-    }) as Promise<void>;
+    }) as Promise<{}>;
   }
    onError(e: Error) {
     console.error(e);

@@ -6,7 +6,11 @@
   bottom: 0;
   display: flex;
   flex-direction: column;
-
+  .navigation-bar{
+    .action a{
+      color: #5393ff;
+    }
+  }
   fieldset {
     flex: 1;
     margin: 0;

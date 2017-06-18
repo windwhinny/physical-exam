@@ -19,6 +19,7 @@ import {
   RecordService as RecordServiceInterface,
 } from '../constants';
 import serviceIPCRegistor from './registor';
+import { sync as bluetoothSync } from './Bluetooth';
 
 const fields = Object.keys(RecordModelSchema).filter(a => a !== 'sign');
 class RecordService implements RecordServiceInterface {
@@ -178,52 +179,135 @@ class RecordService implements RecordServiceInterface {
     return rs.map(this.reverse);
   }
 
+  transformServerFormat(record: RecordPO) {
+    type Time = {
+      min: number,
+      sec: number,
+      milSec: number,
+    }
+    const getSecFromTimeStr = (str: string): Time => {
+      const match = str.match(/(\d*)'(\d*)''(\d*)/);
+      if (!match) return {min: 0, sec: 0, milSec: 0};
+      const min = Number(match[1]);
+      const sec = Number(match[2]);
+      const milSec  = Number(match[3]);
+      return {
+        min,
+        sec,
+        milSec,
+      }
+    }
+
+    const toMin = (time: Time): string => {
+      return `${time.min}.${time.sec}`;
+    }
+
+    const transformRecord  = () => {
+      let strs: string[] = [];
+      let time: Time;
+      switch (record.item) {
+      case '1K':
+      case '8H':
+        strs = record.score.split(',');
+        time = getSecFromTimeStr(strs[1]);
+        return toMin(time);
+      case '5W':
+        strs = record.score.split(',');
+        time = getSecFromTimeStr(strs[2]);
+        return toMin(time);
+      default:
+        return record.score;
+      }
+    }
+
+    const codeMap = {
+      '50': 'wsmp',
+      '8H': 'bbmp',
+      '1K': 'yqmp',
+      'TS': 'ts',
+      'YW': 'ywqz',
+      'TY': 'ldty',
+      'FH': 'fhl',
+      'QQ': 'zwtqq',
+      'YT': 'ytxs',
+      '5W': 'wsmcbwfp',
+      'ST': 'sg',
+      'SX': 'sxq',
+    }
+    const data = {
+      number: record.stuNo,
+      testType: codeMap[record.item as keyof typeof codeMap],
+      time: Math.round(record.testTime.getTime() / 1000),
+      score: transformRecord(),
+    }
+
+    return `data=${JSON.stringify(data)}`;
+  }
+
+  isServerResponseSuccess(data: string): boolean {
+    const match = data.match(/^callback\((.*)\)$/);
+    if (!match) return false;
+    try {
+      const res = JSON.parse(match[1]);
+      if (res.status ===  1) {
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+    return false;
+  }
+
+  httpSync(host: string, data: RecordPO) {
+    const url = `http://${host}/health/index.php/Api/Index/transfer`;
+    return new Promise((resolve, reject) => {
+        const body = this.transformServerFormat(data);
+        request({
+          url,
+          headers: {
+            'Content-type': 'application/x-www-form-urlencoded',
+          },
+          method: 'POST',
+          body,
+          json: false,
+        // tslint:disable-next-line:no-any
+        }, (err: Error, _: any, resBody: string) => {
+          if (err) return reject(err);
+          if (this.isServerResponseSuccess(resBody)) {
+            resolve();
+            return;
+          }
+          reject(new Error('上传失败'));
+          _;
+        });
+      });
+  }
+
+  bluetoothSync(address: string, data: RecordPO) {
+    return bluetoothSync(address, JSON.stringify(this.transformServerFormat(data)));
+  }
+
   async sync(
-    onProgress: (t: number, c: number) => void,
-    host: string,
-    limit: number = 5,
+    onProgress: (t: number, c: number, r: string) => void,
+    address: string = '121.41.13.138',
+    type: 'bluetooth' | 'http' = 'http',
   ): Promise<void> {
     const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
     let proccessed = 0;
     if (!total) return;
-    const get = () => this.model.find({
+    const get = () => this.model.findOne({
         where: {
           synced: 0,
         },
-        limit,
-      }) as Promise<RecordPO[]>;
+      }) as Promise<RecordPO>;
 
-    const update = (data: RecordPO[]) => {
+    const update = (data: RecordPO) => {
       return this.model.update({
         synced: 1,
       }, {
-        uuid: { $in: data.map(d => d.uuid as string)},
+        uuid: data.uuid as string,
       });
     };
-    const url = `http://${host}/score/saves`;
-    const fetch = (data: RecordPO[]) =>
-      new Promise((resolve, reject) => {
-        const body = (data.map(d => Object.assign({}, d, {
-          testTime: getDateString(d.testTime),
-          date: undefined,
-          synced: undefined,
-        })));
-        request({
-          url,
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
-          body,
-          json: true,
-        // tslint:disable-next-line:no-any
-        }, (err: Error, _: any, resBody: { code: number }) => {
-          if (err) return reject(err);
-          if (resBody.code !== 1) return reject(new Error('上传失败'));
-          resolve();
-          _;
-        });
-      });
 
     // const fetch = () => new Promise(resolve => {
     //   setTimeout(resolve, 10000);
@@ -231,13 +315,18 @@ class RecordService implements RecordServiceInterface {
     let errorTimes = 0;
     while (true) {
       const rs = await get();
-      if (!rs.length) break;
+      if (!rs) break;
       try {
-        await fetch(rs);
+        let result: string = '';
+        if (type === 'http') {
+          await this.httpSync(address, rs);
+        } else {
+          result = await this.bluetoothSync(address, rs);
+        }
         await update(rs);
-        proccessed += rs.length;
+        proccessed += 1;
         // tslint:disable-next-line:no-any
-        onProgress((total as any)[0].count, proccessed);
+        onProgress((total as any)[0].count, proccessed, result);
       } catch (e) {
         console.error(e);
         if (errorTimes >= 0) {

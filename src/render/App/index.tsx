@@ -10,6 +10,7 @@ import SearchPage from '../pages/SearchPage';
 import DailyReportPage from '../pages/DailyReportPage';
 import SettingPage from '../pages/SettingPage';
 import CalendarPage from '../pages/CalendarPage';
+import SyncPage from '../pages/SyncPage';
 import { history } from '../store';
 import actions from '../actions';
 import { connect } from 'react-redux';
@@ -46,6 +47,7 @@ class App extends React.Component<Props, State> {
         <Route path="/student" component={StudentPage as any} />
         <Route path="/daily" component={DailyReportPage as any} />
         <Route path="/addStudent" component={AddStudentPage as any} />
+        <Route path="/sync" component={SyncPage as any} />
       </div>
     </ConnectedRouter >;
   }

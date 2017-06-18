@@ -141,9 +141,9 @@ export interface RecordService {
   getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
   getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(
-    onProgress: (t: number, c: number) => void,
+    onProgress: (t: number, c: number, r: string) => void,
     host: string,
-    limit?: number,
+    type: 'bluetooth' | 'http',
   ): Promise<void>;
 }
 
@@ -156,6 +156,13 @@ export interface DeviceManagerService {
   setTestType(type: TestType): Promise<null | true>;
   getDeviceList(): Promise<string[]>;
   getMaxDeviceNo(): Promise<string | null>;
+}
+
+export interface BluetoothService {
+  listDevices(cb: (device: {
+    name: string,
+    address: string,
+  }) => void): Promise<void>;
 }
 
 export interface CardReaderService {

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluetooth-serial-port": "^2.1.2",
     "classnames": "^2.2.5",
     "iconv": "^2.2.3",
     "node-serial": "^0.1.1",

@@ -8,8 +8,6 @@ import Calendar from '../../components/Calendar';
 import url = require('url');
 import actions from '../../actions';
 import cx = require('classnames');
-import RecordService from '../../services/Record';
-import Dialog from '../../components/Dialog';
 import List from './List';
 import Test, { Props as TestProps } from './Test';
 import {
@@ -41,13 +39,6 @@ type Props = RouteComponentProps<{}> & {
 type State = {
   isCalendarShow: boolean,
   activeMonth: [number, number],
-  updateProgress: {
-    uploading: boolean,
-    total: number,
-    processed: number,
-    showDialog: boolean,
-    error: boolean,
-  },
   tab: 'testList' | 'resultList',
 }
 
@@ -58,21 +49,12 @@ class DailyReportPage extends React.PureComponent<Props, State> {
     this.state = {
       isCalendarShow: false,
       activeMonth: [date.getFullYear(), date.getMonth()],
-      updateProgress: {
-        uploading: false,
-        total: 0,
-        processed: 0,
-        showDialog: false,
-        error: false,
-      },
       tab: 'testList',
     }
 
     bindMethod(this, [
       'toggleCalendar',
       'onHoveredMonthChanged',
-      'sync',
-      'closeDialog',
       ]);
   }
 
@@ -99,45 +81,6 @@ class DailyReportPage extends React.PureComponent<Props, State> {
     this.setState({
       activeMonth: [year, month],
     });
-  }
-
-  async sync() {
-    const { ip } = this.props;
-    if (!ip) return;
-    let { updateProgress } = this.state;
-    updateProgress = Object.assign({}, updateProgress, {
-      uploading: true,
-      error: false,
-    });
-    this.setState({ updateProgress })
-    try {
-      await RecordService('sync')((t, c) => {
-        updateProgress = Object.assign({}, updateProgress, {
-          total: t,
-          processed: c,
-        });
-        this.setState({ updateProgress })
-      }, ip);
-    } catch (e) {
-      updateProgress = Object.assign({}, updateProgress, {
-        error: true,
-      });
-    }
-    updateProgress = Object.assign({}, updateProgress, {
-      uploading: false,
-      showDialog: true,
-    });
-    this.setState({ updateProgress });
-  }
-
-  closeDialog() {
-    let { updateProgress } = this.state;
-    updateProgress = Object.assign({}, updateProgress, {
-      showDialog: false,
-    });
-    this.setState({
-      updateProgress,
-    })
   }
 
   renderNavigationBar() {
@@ -185,30 +128,12 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   }
 
   renderBottomAction() {
-    const { records, ip } = this.props;
-    const { updateProgress } = this.state;
-    if (updateProgress.uploading) {
-      return <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
-    } else if (records.length) {
-      if (!ip) {
-        return <button className="sync" disabled>未设置 IP，暂不能上传</button>
-      } else {
-        return <button className="sync" onClick={this.sync}>同步数据</button>
-      }
+    const { records } = this.props;
+    if (records.length) {
+      return <Link className="sync" to="/sync">同步数据</Link>
     } else {
       return null;
     }
-  }
-
-  renderDialog() {
-    const { updateProgress } = this.state;
-    if (updateProgress.showDialog) {
-      return <Dialog
-          title={updateProgress.error ? '上传失败' : '上传成功'}
-          onConfirm={this.closeDialog}
-          onCancel={this.closeDialog}/>;
-    }
-    return null;
   }
 
   renderList() {
@@ -228,6 +153,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       date={date}
       pending={pending}
       pagination={pagination}
+      key={1}
       />;
     const activeList = (name: typeof tab) => () => this.setState({ tab: name});
     if (getStartOfDate(today).getTime() === getStartOfDate(date).getTime()) {
@@ -252,7 +178,6 @@ class DailyReportPage extends React.PureComponent<Props, State> {
       <div className={cx('mask', isCalendarShow && 'show')} onClick={this.toggleCalendar}></div>
       {this.renderCalendar()}
       {this.renderList()}
-      {this.renderDialog()}
     </div>;
   }
 }
