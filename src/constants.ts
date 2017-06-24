@@ -141,7 +141,7 @@ export interface RecordService {
   getByDate(date: Date, type: TestType | null, pagination: Pagination): Promise<TestRecord[]>;
   getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(
-    onProgress: (t: number, c: number, r: string) => void,
+    onProgress: (t: number, c: number, u: number) => void,
     host: string,
     type: 'bluetooth' | 'http',
   ): Promise<void>;
@@ -166,6 +166,10 @@ export interface BluetoothService {
 }
 
 export interface CardReaderService {
-  read(pin: string, cb: (student: Student) => void): Promise<void>;
+  read(
+    pin: string,
+    cb: (student: Student) => void,
+    onError?: (err: Error) => void,
+  ): Promise<void>;
   stopRead(): void;
 }

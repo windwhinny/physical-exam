@@ -68,7 +68,8 @@
   },
   "build": {
     "extraFiles": [
-      "sdk/*"
+      "sdk/*",
+      "bthcxn.exe"
     ]
   }
 }

@@ -62,7 +62,11 @@ export default class extends React.Component<Props, State> {
         if (this.readingCard) break;
         this.readingCard = true;
         if (props.pinCode) {
-          CardReader('read')(props.pinCode, student => actions.DRPAddStudent(student));
+          CardReader('read')(props.pinCode, student => {
+            actions.DRPAddStudent(student)
+          }, err => {
+            console.error(err);
+          });
         }
         break;
       }

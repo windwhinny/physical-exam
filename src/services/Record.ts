@@ -19,8 +19,22 @@ import {
   RecordService as RecordServiceInterface,
 } from '../constants';
 import serviceIPCRegistor from './registor';
-import { sync as bluetoothSync } from './Bluetooth';
+import BluetootService from './Bluetooth';
 
+const codeMap = {
+  '50': 'wsmp',
+  '8H': 'bbmp',
+  '1K': 'yqmp',
+  'TS': 'ts',
+  'YW': 'ywqz',
+  'TY': 'ldty',
+  'FH': 'fhl',
+  'QQ': 'zwtqq',
+  'YT': 'ytxs',
+  '5W': 'wsmcbwfp',
+  'ST': 'sg',
+  'SX': 'sxq',
+}
 const fields = Object.keys(RecordModelSchema).filter(a => a !== 'sign');
 class RecordService implements RecordServiceInterface {
    model: RecordModel;
@@ -220,20 +234,6 @@ class RecordService implements RecordServiceInterface {
       }
     }
 
-    const codeMap = {
-      '50': 'wsmp',
-      '8H': 'bbmp',
-      '1K': 'yqmp',
-      'TS': 'ts',
-      'YW': 'ywqz',
-      'TY': 'ldty',
-      'FH': 'fhl',
-      'QQ': 'zwtqq',
-      'YT': 'ytxs',
-      '5W': 'wsmcbwfp',
-      'ST': 'sg',
-      'SX': 'sxq',
-    }
     const data = {
       number: record.stuNo,
       testType: codeMap[record.item as keyof typeof codeMap],
@@ -283,22 +283,49 @@ class RecordService implements RecordServiceInterface {
       });
   }
 
-  bluetoothSync(address: string, data: RecordPO) {
-    return bluetoothSync(address, JSON.stringify(this.transformServerFormat(data)));
+  bluetoothSync(address: string, data: RecordPO, total: number, uploaded: number) {
+    let height: undefined | number = undefined;
+    let weight: undefined | number = undefined;
+    let performance: undefined | string = undefined;
+    if (data.item === 'ST') {
+      const strs = data.score.split(',');
+      height = Number(strs[0]);
+      weight = Number(strs[1]);
+    } else {
+      performance = data.score;
+    }
+    const transData = {
+      currentIndex: uploaded,
+      total,
+      dbPerformance: {
+        type: codeMap[data.item as keyof typeof codeMap],
+        studentId: data.stuNo,
+        height,
+        weight,
+        performance,
+        time: data.testTime.getTime(),
+        isSubmit: 0,
+        isExternal: 1,
+        studName: data.stuName,
+      },
+    }
+    return BluetootService.sync(address, JSON.stringify(transData));
   }
 
   async sync(
-    onProgress: (t: number, c: number, r: string) => void,
+    onProgress: (t: number, c: number, r: number) => void,
     address: string = '121.41.13.138',
     type: 'bluetooth' | 'http' = 'http',
   ): Promise<void> {
     const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
     let proccessed = 0;
+    let uploaded = 0;
     if (!total) return;
     const get = () => this.model.findOne({
         where: {
           synced: 0,
         },
+        offset: proccessed - uploaded,
       }) as Promise<RecordPO>;
 
     const update = (data: RecordPO) => {
@@ -312,28 +339,29 @@ class RecordService implements RecordServiceInterface {
     // const fetch = () => new Promise(resolve => {
     //   setTimeout(resolve, 10000);
     // });
-    let errorTimes = 0;
     while (true) {
       const rs = await get();
-      if (!rs) break;
       try {
         let result: string = '';
         if (type === 'http') {
+          if (!rs) break;
           await this.httpSync(address, rs);
         } else {
-          result = await this.bluetoothSync(address, rs);
+          if (!rs) {
+            await BluetootService.sync(address, null);
+            break;
+          }
+          // tslint:disable-next-line:no-any
+          result = await this.bluetoothSync(address, rs, (total as any)[0].count, uploaded);
         }
         await update(rs);
-        proccessed += 1;
-        // tslint:disable-next-line:no-any
-        onProgress((total as any)[0].count, proccessed, result);
+        uploaded++;
       } catch (e) {
         console.error(e);
-        if (errorTimes >= 0) {
-          throw new Error('上传失败');
-        }
-        errorTimes++;
       }
+      proccessed++;
+      // tslint:disable-next-line:no-any
+      onProgress((total as any)[0].count, proccessed, uploaded);
     }
   }
 }

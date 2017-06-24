@@ -30,7 +30,7 @@ type State = {
     total: number,
     processed: number,
     showDialog: boolean,
-    error: boolean,
+    error: boolean | string,
   },
 }
 
@@ -76,19 +76,22 @@ export class SyncPage extends React.Component<Props, State> {
     const { ip } = this.props;
     if (!ip) return;
     let { updateProgress } = this.state;
+    let processed = 0;
+    let uploaded = 0;
     updateProgress = Object.assign({}, updateProgress, {
       uploading: true,
       error: false,
     });
     this.setState({ updateProgress })
     try {
-      await RecordService('sync')((t, c, r) => {
+      await RecordService('sync')((t, p, u) => {
         updateProgress = Object.assign({}, updateProgress, {
           total: t,
-          processed: c,
+          processed: p,
         });
-        console.log('upload result', r);
         this.setState({ updateProgress })
+        processed = p;
+        uploaded = u;
       }, address, type);
     } catch (e) {
       updateProgress = Object.assign({}, updateProgress, {
@@ -99,6 +102,10 @@ export class SyncPage extends React.Component<Props, State> {
       uploading: false,
       showDialog: true,
     });
+    if (processed !== uploaded) {
+      updateProgress.error = '部分数据上传失败';
+      updateProgress.showDialog = true;
+    }
     this.setState({ updateProgress });
   }
 
@@ -176,8 +183,15 @@ export class SyncPage extends React.Component<Props, State> {
   renderDialog() {
     const { updateProgress } = this.state;
     if (updateProgress.showDialog) {
+      const msg = typeof updateProgress.error === 'string' ?
+        updateProgress.error
+        :
+        updateProgress.error ?
+          '上传失败'
+          :
+          '上传成功';
       return <Dialog
-          title={updateProgress.error ? '上传失败' : '上传成功'}
+          title={msg}
           onConfirm={this.closeDialog}
           onCancel={this.closeDialog}/>;
     }

@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import store from './store';
 import electron = require('electron')
 import { throttle } from './../lib/utils';
-
 function render() {
   const App = require('./App').default;
   ReactDOM.render(
