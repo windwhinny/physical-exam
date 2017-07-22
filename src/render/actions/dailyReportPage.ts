@@ -84,6 +84,15 @@ export const DRPClearTestByIndex = (index: number) => ({
 const DRPClearTestByIndexRV = getReturnVal(DRPClearTestByIndex);
 export type DRPClearTestByIndexAction = typeof DRPClearTestByIndexRV;
 
+export const DRP_PREPARE_TEST = 'DRP_PREPARE_TEST';
+export const DRPPrepareTest = () => {
+  return {
+    type: DRP_PREPARE_TEST,
+  }
+};
+const DRPPrepareTestRV = getReturnVal(DRPPrepareTest);
+export type DRPPrepareTestAction = typeof DRPPrepareTestRV;
+
 export const DRP_START_TEST = 'DRP_START_TEST';
 export const DRPStartTest = () => {
   return {

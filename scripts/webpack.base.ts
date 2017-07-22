@@ -1,27 +1,10 @@
 import webpack = require('webpack');
-import path = require('path');
-import config = require('config');
 import TSLoader = require('awesome-typescript-loader');
 const px2rem = require('postcss-px2rem');
-const root = config.get('root') as string;
-const publicPath = 'http://localhost:8080/'
 export default {
-  output: {
-    filename: '[name].js',
-    path: path.resolve(root, './src'),
-    publicPath,
-  },
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: ['.ts', '.tsx', '.js', '.json'],
-  },
-  entry: {
-    app: [
-      'react-hot-loader/patch',
-      'webpack-dev-server/client?http://localhost:8080',
-      'webpack/hot/only-dev-server',
-      path.resolve(root, './src/render/index.tsx'),
-    ],
   },
   module: {
     rules: [{
@@ -58,19 +41,12 @@ export default {
       ],
     }]
   },
-  devtool: 'source-map',
   target: 'electron-renderer',
-  devServer: {
-    hot: true,
-    contentBase: path.join(root, 'src'),
-    publicPath,
-    port: 8080,
-  },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(),
     new TSLoader.TsConfigPathsPlugin({
       configFileName: 'src/render/tsconfig.json',
-    })
+    // tslint:disable-next-line:no-any
+    }) as any,
   ],
 }

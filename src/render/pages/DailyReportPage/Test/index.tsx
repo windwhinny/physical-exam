@@ -19,6 +19,8 @@ import ScoreComponent from '../../../components/Score';
 import Dialog from '../../../components/Dialog';
 import SignBoard from './SignBoard';
 import CardReader from '../../../services/CardReader';
+import play from '../../../audio';
+import Timmer from './Timmer';
 export type Props = {
   type: TestType,
   ip: string | null,
@@ -39,9 +41,11 @@ export default class extends React.Component<Props, State> {
     };
     bindMethod(this, [
       'renderDevice',
+      'prepareTest',
       'startTest',
       'endTest',
       'saveTest',
+      'onTimmerUpdate',
       'startNextRound']);
   }
 
@@ -135,11 +139,39 @@ export default class extends React.Component<Props, State> {
     this.startTest();
   }
 
+  onTimmerUpdate(d: Date) {
+    const { status, type } = this.props;
+    if (status !== 'testing') return;
+    if (![TestType.RopeSkipping, TestType.SitAndReach].includes(type)) return;
+    const seconds = d.getSeconds() + (d.getMilliseconds() / 1000);
+    const left = 20 - seconds;
+    if (left < 11 && left > 0) {
+      play(`/audios/${Math.floor(left)}.mp3`);
+    } else if (left <= 0) {
+      this.endTest();
+    }
+  }
+
+  prepareTest() {
+    actions.DRPPrepareTest();
+    play('/audios/prepare.mp3');
+  }
+
   async startTest() {
     const {
       deviceList,
       type,
     } = this.props;
+    if ([
+      TestType.Running1000,
+      TestType.Running800,
+      TestType.Running50,
+      TestType.RunningBackAndForth,
+    ].includes(this.props.type)) {
+      await play('/audios/prepare_run.mp3');
+    } else if (TestType.HeightAndWeight !== this.props.type) {
+      await play('/audios/begin.mp3');
+    }
     await actions.DRPStartTest().promise.originPromise;
     const fn = () => {
       const { status } = this.props;
@@ -279,14 +311,16 @@ export default class extends React.Component<Props, State> {
           //   ];
           // }
         } else if (students.length) {
-          return <button onClick={this.startTest}>开始测试</button>
+          return <button onClick={this.prepareTest}>准备测试</button>;
         } else {
-          return <button disabled>请刷卡或手动添加学生信息</button>
+          return <button disabled>请刷卡或手动添加学生信息</button>;
         }
+      } else if (status === 'prepare') {
+        return <button onClick={this.startTest}>开始测试</button>;
       } else if (status === 'testing') {
-        return <button onClick={this.endTest}>结束测试</button>
+        return <button onClick={this.endTest}>结束测试 <Timmer onUpdate={this.onTimmerUpdate}/></button>;
       } else if (status === 'pending') {
-        return <button disabled>正在执行...</button>
+      return <button disabled>正在执行...</button>;
       }
     }
     return <div className="actions">

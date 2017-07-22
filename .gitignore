@@ -4,3 +4,5 @@ node_modules
 dist
 sdk/SDKLog/*
 sdk/log/**/*
+log/ConCardReader/*.txt
+sdk/SDKDB.db

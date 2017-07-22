@@ -1,11 +1,11 @@
 {
   "name": "physical-exam",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "体育测试",
   "main": "src/index.js",
   "scripts": {
     "launch": "electron .",
-    "dev": "webpack-dev-server.cmd --config scripts/webpack.config.js",
+    "dev": "webpack-dev-server.cmd --config scripts/webpack.dev.js",
     "build": "node scripts/build"
   },
   "author": "",
@@ -49,6 +49,7 @@
     "@types/uuid": "^2.0.29",
     "@types/webpack": "^2.2.15",
     "awesome-typescript-loader": "^3.1.2",
+    "babili-webpack-plugin": "^0.1.2",
     "config": "^1.25.1",
     "css-loader": "^0.28.0",
     "cssnano": "^3.10.0",

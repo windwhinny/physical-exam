@@ -54,6 +54,7 @@ export class SyncPage extends React.Component<Props, State> {
     bindMethod(this, [
       'onCancel',
       'closeDialog',
+      'ipOnChange',
       ]);
   }
   onCancel() {
@@ -73,8 +74,6 @@ export class SyncPage extends React.Component<Props, State> {
   }
 
   async sync(address: string, type: 'http' | 'bluetooth') {
-    const { ip } = this.props;
-    if (!ip) return;
     let { updateProgress } = this.state;
     let processed = 0;
     let uploaded = 0;

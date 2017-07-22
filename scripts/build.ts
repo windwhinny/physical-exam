@@ -1,5 +1,5 @@
 import webpack = require('webpack');
-import webpackConfig from './webpack.config';
+import webpackConfig from './webpack.prod';
 const builder = require('electron-builder');
 
 function webpackBuild() {
@@ -36,6 +36,7 @@ function electronBuild () {
       productName: '体育测试',
       files: [
         'src/**/*.js',
+        'src/**/*.mp3',
         'src/index.html',
         '!src/render/**/*.js',
         'dist/app.js',

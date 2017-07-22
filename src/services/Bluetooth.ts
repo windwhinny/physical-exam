@@ -15,8 +15,14 @@ export class Bluetooth implements BluetoothService {
   process: child_process.ChildProcess | null = null;
   listDevices(cb: (device: {name: string, address: string}) => void) {
     return new Promise((resolve, reject) => {
-      const child = child_process.spawn(cmd);
-      child.stdout.on('data', buffer => {
+      child_process.execFile(cmd, {
+        encoding: 'buffer',
+      }, (err, buffer, stderr) => {
+        if (err) return reject(err);
+        if (stderr && stderr.length) {
+          console.error(stderr.toString());
+          return reject(new Error('搜索设备出错'))
+        }
         let stdout = iconv.convert(buffer).toString() as string;
         stdout = stdout.replace('\r\n', '\n');
         const devices = stdout.split('\n');
@@ -27,13 +33,7 @@ export class Bluetooth implements BluetoothService {
           const address =  (strs[1] || '').replace(/[\(\)\r\n]/g, '');
           cb({name, address});
         });
-      });
-      child.on('close', (code: number) => {
-        if (code !== 0) {
-          reject(new Error('搜索失败'));
-        } else {
-          resolve();
-        }
+        resolve();
       });
     }) as Promise<void>;
   }
@@ -71,6 +71,7 @@ export class Bluetooth implements BluetoothService {
         }
       });
       const onData = (stdout: Buffer) => {
+        console.log('onData', stdout.toString());
         try {
           const resp = JSON.parse(stdout.toString())
           if (resp.status !== 1) {
@@ -83,6 +84,7 @@ export class Bluetooth implements BluetoothService {
         }
       };
       const onError = (e: Error | Buffer) => {
+        console.error(e);
         if (e instanceof Buffer) {
           console.error(e.toString());
         } else {

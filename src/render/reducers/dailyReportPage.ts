@@ -11,6 +11,8 @@ import {
   DRPClearTestByIndexAction,
   DRP_START_TEST,
   DRPStartTestAction,
+  DRPPrepareTestAction,
+  DRP_PREPARE_TEST,
   DRP_END_TEST,
   DRPEndTestAction,
   DRP_GET_SCORE,
@@ -93,6 +95,7 @@ const testReducer = (
     DRPAddStudentAction |
     DRPClearTestByIndexAction |
     DRPStartTestAction |
+    DRPPrepareTestAction |
     DRPEndTestAction |
     DRPGetScoreAction |
     DRPSaveTestResultAction |
@@ -126,6 +129,11 @@ const testReducer = (
       const students = state.students.slice();
       students[index] = null;
       return Object.assign({}, state, { students })
+    }
+    case DRP_PREPARE_TEST: {
+      return Object.assign({}, state, {
+        status: 'prepare',
+      });
     }
     case DRP_START_TEST: {
       const ac = action as DRPStartTestAction;

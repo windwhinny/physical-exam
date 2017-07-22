@@ -34,8 +34,9 @@ function fetch (pin: string) {
       const strs = data.toString().split('|');
       if (strs[2].includes('失败')) {
         return reject(new Error(data));
+      } else if (strs.length < 10) {
+        return reject(new Error('读取失败'));
       }
-      strs[3];
       const student: Student = {
         name: strs[4],
         nu: strs[3],
