@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { State as RootState } from '../../store';
 import actions from '../../actions';
 import Dialog from '../../components/Dialog';
+import URL = require('url');
 import {
   bindMethod,
 } from '../../../lib/utils';
@@ -17,13 +18,13 @@ type Device = {
   address: string,
 }
 type Props = RouteComponentProps<{}>& {
-  ip: string
+  uploadUrl: string
 }
 
 type State = {
   devices: Device[],
   selectedType: 'http' | 'bluetooth',
-  ip: string | null,
+  uploadUrl: string | null,
   searchingBluetoothDevices: boolean,
   updateProgress: {
     uploading: boolean,
@@ -40,7 +41,7 @@ export class SyncPage extends React.Component<Props, State> {
 
     this.state = {
       devices: [],
-      ip: props.ip,
+      uploadUrl: props.uploadUrl,
       selectedType: 'http',
       searchingBluetoothDevices: false,
       updateProgress: {
@@ -54,7 +55,7 @@ export class SyncPage extends React.Component<Props, State> {
     bindMethod(this, [
       'onCancel',
       'closeDialog',
-      'ipOnChange',
+      'uploadUrlOnChange',
       ]);
   }
   onCancel() {
@@ -122,34 +123,34 @@ export class SyncPage extends React.Component<Props, State> {
     </ul>
   }
 
-  isIPValid(ip: string): boolean {
-    if (!ip) return false;
-    if (ip && !ip.match(/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/)) {
-      return false;
-    };
+  isUrlValid(url: string): boolean {
+    if (!url) return false;
+    const obj = URL.parse(url, true);
+    if (!obj.protocol) return false;
+    if (!obj.host) return false;
     return true;
   }
 
-  ipOnChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const ip = event.currentTarget.value;
+  uploadUrlOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const uploadUrl = event.currentTarget.value;
     this.setState({
-      ip,
+      uploadUrl,
     });
-    if (this.isIPValid(ip)) {
-      actions.loginOrLogout(ip);
+    if (this.isUrlValid(uploadUrl)) {
+      actions.AppSetUploadUrl(uploadUrl);
     }
   }
 
   renderIPInput() {
-    const { ip } = this.state;
+    const { uploadUrl } = this.state;
     return <label>
-      <p className="field-name">上传服务器 IP 地址</p>
-      <input name="ip" placeholder="请输入IP地址" value={ip || ''} onChange={this.ipOnChange}/>;
+      <p className="field-name">上传服务器地址</p>
+      <input name="ip" placeholder="请输入上传地址" value={uploadUrl || ''} onChange={this.uploadUrlOnChange}/>
     </label>
   }
 
   renderBottomAction() {
-    const { ip } = this.props;
+    const { uploadUrl } = this.props;
     const {
        updateProgress,
        searchingBluetoothDevices,
@@ -157,10 +158,10 @@ export class SyncPage extends React.Component<Props, State> {
     if (updateProgress.uploading) {
       return <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
     } else if (this.state.selectedType === 'http') {
-      if (!this.isIPValid(ip)) {
-        return <button className="sync" disabled>IP 设置不正确，暂不能上传</button>
+      if (!this.isUrlValid(uploadUrl)) {
+        return <button className="sync" disabled>地址设置不正确，暂不能上传</button>
       } else {
-        return <button className="sync" onClick={() => this.sync(ip, 'http')}>同步数据</button>
+        return <button className="sync" onClick={() => this.sync(uploadUrl, 'http')}>同步数据</button>
       }
     } else if (searchingBluetoothDevices) {
       return <button className="sync" disabled>正在搜索蓝牙设备...</button>
@@ -229,6 +230,6 @@ export class SyncPage extends React.Component<Props, State> {
 
 export default connect((state: RootState) => {
   return Object.assign({}, {
-    ip: state.user ? state.user.ip : null,
+    uploadUrl: state.app.uploadUrl,
   });
 })(SyncPage);

@@ -1,4 +1,3 @@
-import * as UserActions from './user';
 import * as SelectedDateActions from './selectedDate';
 import * as AppActions from './app';
 import * as DailyReportPageActions from './dailyReportPage';
@@ -10,7 +9,6 @@ import { bindActionCreators } from '../utils';
 import store from '../store';
 const actions =  Object.assign({},
   SearchPageActions,
-  UserActions,
   SelectedDateActions,
   AppActions,
   DailyReportPageActions,
@@ -18,7 +16,6 @@ const actions =  Object.assign({},
   CalendarPageActions,
 ) as
   typeof SearchPageActions &
-  typeof UserActions &
   typeof SelectedDateActions &
   typeof AppActions &
   typeof DailyReportPageActions &

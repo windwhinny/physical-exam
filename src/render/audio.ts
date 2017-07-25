@@ -1,7 +1,7 @@
 const map: Map<string, HTMLAudioElement> = new Map();
 for (let i = 0; i <= 10 ; i++) {
   const audio = new Audio();
-  const url = `/audios/${i}.mp3`;
+  const url = `./audios/${i}.mp3`;
   audio.src = url;
   map.set(url, audio);
 }

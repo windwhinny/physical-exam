@@ -5,6 +5,8 @@ import {
   APP_UPDATE_PIN_CODE,
   AppUpdatePinCodeAction,
   AppChangeModeAction,
+  AppSetUploadUrlAction,
+  APP_SET_UPLOAD_URL
 } from '../actions/app';
 import {
   getReturnVal,
@@ -16,6 +18,7 @@ export type AppState = {
   inited: boolean,
   mode: string,
   pinCode: string | null,
+  uploadUrl: string | null,
 }
 
 export default function(
@@ -24,8 +27,9 @@ export default function(
     inited: false,
     mode: localStorage.getItem('mode') || 'normal',
     pinCode: localStorage.getItem('pin-code') || null,
+    uploadUrl: localStorage.getItem('upload-url') || null,
   },
-  action: typeof loginOrLogoutAction | AppChangeModeAction | AppUpdatePinCodeAction): AppState {
+  action: typeof loginOrLogoutAction | AppChangeModeAction | AppUpdatePinCodeAction | AppSetUploadUrlAction): AppState {
   switch (action.type) {
     case APP_INIT: {
       const ac = action as typeof loginOrLogoutAction;
@@ -46,6 +50,13 @@ export default function(
             inited: false,
           });
       }
+    }
+    case APP_SET_UPLOAD_URL: {
+      const ac = action as AppSetUploadUrlAction;
+      localStorage.setItem('upload-url', ac.url);
+      return Object.assign({}, state, {
+        uploadUrl: ac.url,
+      });
     }
     case APP_UPDATE_PIN_CODE: {
       const ac = action as AppUpdatePinCodeAction;

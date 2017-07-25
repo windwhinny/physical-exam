@@ -23,9 +23,6 @@ require('./index.scss');
 type State = { };
 type Props = {
   inited: boolean,
-  user: {
-    ip: string,
-  } | null,
 };
 
 class App extends React.Component<Props, State> {
@@ -54,5 +51,4 @@ class App extends React.Component<Props, State> {
 }
 export default connect((state: RootState) => ({
   inited: state.app.inited,
-  user: state.user,
 }))(App);

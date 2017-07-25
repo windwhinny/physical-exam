@@ -192,11 +192,9 @@ export default connect((state: RootState) => {
   return Object.assign({}, state.dailyReportPage, {
     date: state.selectedDate,
     type: testType,
-    ip: state.user ? state.user.ip : null,
     test: Object.assign({}, state.dailyReportPage.test, {
       pinCode: state.app.pinCode,
       type: testType,
-      ip: state.user ? state.user.ip : null,
       mode: state.app.mode,
     }),
   });

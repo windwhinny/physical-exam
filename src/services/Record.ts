@@ -258,8 +258,7 @@ class RecordService implements RecordServiceInterface {
     return false;
   }
 
-  httpSync(host: string, data: RecordPO) {
-    const url = `http://${host}/health/index.php/Api/Index/transfer`;
+  httpSync(url: string, data: RecordPO) {
     return new Promise((resolve, reject) => {
         const body = this.transformServerFormat(data);
         request({
@@ -298,7 +297,7 @@ class RecordService implements RecordServiceInterface {
       currentIndex: uploaded,
       total,
       dbPerformance: {
-        type: codeMap[data.item as keyof typeof codeMap],
+        type: data.item === 'ST' ? 'bmi' : codeMap[data.item as keyof typeof codeMap],
         studentId: data.stuNo,
         height,
         weight,
@@ -309,15 +308,16 @@ class RecordService implements RecordServiceInterface {
         studName: data.stuName,
       },
     }
+    console.log(transData);
     return BluetootService.sync(address, JSON.stringify(transData));
   }
 
   async sync(
     onProgress: (t: number, c: number, r: number) => void,
-    address: string = '121.41.13.138',
-    type: 'bluetooth' | 'http' = 'http',
+    address: string,
+    type: 'bluetooth' | 'http',
   ): Promise<void> {
-    const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records', values: []});
+    const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records where synced = 0', values: []});
     let proccessed = 0;
     let uploaded = 0;
     if (!total) return;

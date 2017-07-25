@@ -27,3 +27,11 @@ export const AppUpdatePinCode = (pinCode: string) => ({
 });
 const AppUpdatePinCodeRV = getReturnVal(AppUpdatePinCode);
 export type AppUpdatePinCodeAction = typeof AppUpdatePinCodeRV;
+
+export const APP_SET_UPLOAD_URL = 'SET_UPLOAD_URL';
+export const AppSetUploadUrl = (url: string) => ({
+  type: APP_SET_UPLOAD_URL,
+  url,
+});
+const SetUploadUrlRV = getReturnVal(AppSetUploadUrl);
+export type AppSetUploadUrlAction = typeof SetUploadUrlRV;

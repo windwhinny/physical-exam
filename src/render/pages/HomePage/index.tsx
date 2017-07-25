@@ -15,7 +15,6 @@ import {
 require('./index.scss');
 type Props = {
   date: Date,
-  user: null | { ip: string},
   mode: string,
 }
 
@@ -29,13 +28,8 @@ class HomePage extends React.Component<Props, State> {
     this.state = {
       showLoginDialog: false,
     }
-    bindMethod(this, ['logout', 'onCloseDialog']);
+    bindMethod(this, ['onCloseDialog']);
   }
-
-  logout() {
-    actions.loginOrLogout(null);
-  }
-
 
   onCloseDialog() {
     this.setState({
@@ -90,7 +84,6 @@ class HomePage extends React.Component<Props, State> {
 export default connect((state: RootState) => {
   return {
     date: state.selectedDate,
-    user: state.user,
     mode: state.app.mode,
   }
 })(HomePage);

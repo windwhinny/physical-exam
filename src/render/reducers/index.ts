@@ -1,6 +1,5 @@
 import { combineReducers} from 'redux'
 import { routerReducer, RouterState } from 'react-router-redux'
-import user, { UserState } from './user';
 import selectedDate  from './selectedDate';
 import app, { AppState } from './app';
 import dailyReportPage, { DailyReportPageState } from './dailyReportPage';
@@ -10,7 +9,6 @@ import calendarPage, { CalendarPageState } from './calendarPage';
 
 export default combineReducers({
   app,
-  user,
   selectedDate,
   routing: routerReducer,
   dailyReportPage,
@@ -21,7 +19,6 @@ export default combineReducers({
 
 export type State = {
   routing: RouterState,
-  user: UserState,
   selectedDate: Date,
   app: AppState,
   dailyReportPage: DailyReportPageState,
