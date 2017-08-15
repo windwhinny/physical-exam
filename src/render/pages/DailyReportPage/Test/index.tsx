@@ -4,7 +4,7 @@ import {
   Gender,
   TestRecord,
   Score,
-  // Student,
+  Student,
 } from '../../../../constants';
 import actions from '../../../actions';
 import {
@@ -142,8 +142,8 @@ export default class extends React.Component<Props, State> {
   onTimmerUpdate(d: Date) {
     const { status, type } = this.props;
     if (status !== 'testing') return;
-    if (![TestType.RopeSkipping, TestType.SitAndReach].includes(type)) return;
-    const seconds = d.getSeconds() + (d.getMilliseconds() / 1000);
+    if (![TestType.RopeSkipping, TestType.Situps].includes(type)) return;
+    const seconds = d.getMinutes() * 60 + d.getSeconds() + (d.getMilliseconds() / 1000);
     const left = 60 - seconds;
     if (left < 11 && left > 0) {
       play(`./audios/${Math.floor(left)}.mp3`);
@@ -208,7 +208,7 @@ export default class extends React.Component<Props, State> {
       const { score } = device;
       if (status === 'testing' || score) {
         return <div className="testing">
-          {score && <ScoreComponent data={score.data} type={type}/>}
+          {score && <ScoreComponent data={score.data} type={type} final={score.final}/>}
           {status === 'testing' && <div className="status">测试中</div>}
         </div>;
       } else if (!student) {
@@ -292,7 +292,7 @@ export default class extends React.Component<Props, State> {
       students,
       type,
       round,
-      // mode,
+      mode,
     } = this.props;
     const renderButton = () => {
       if (!deviceList.length) {
@@ -301,15 +301,15 @@ export default class extends React.Component<Props, State> {
         if (type === TestType.VitalCapacity && round === 1) {
           return <button onClick={this.startNextRound}>开始二轮测试</button>;
         } else if (deviceList.find(d => !!d.score) && students.length) {
-          return <button onClick={this.saveTest}>保存测试成绩</button>;
-          // if (mode === 'normal') {
-          //   return <button onClick={this.saveTest}>保存测试成绩</button>;
-          // } else {
-          //   return [
-          //     <SignBoard students={students.filter(Boolean) as Student[]} ref="signBoard" key={1}/>,
-          //     <button onClick={this.saveTest} key={2}>保存测试成绩</button>
-          //   ];
-          // }
+          // return <button onClick={this.saveTest}>保存测试成绩</button>;
+          if (mode === 'normal') {
+            return <button onClick={this.saveTest}>保存测试成绩</button>;
+          } else {
+            return [
+              <SignBoard students={students.filter(Boolean) as Student[]} ref="signBoard" key={1}/>,
+              <button onClick={this.saveTest} key={2}>保存测试成绩</button>
+            ];
+          }
         } else if (students.length) {
           return <button onClick={this.prepareTest}>准备测试</button>;
         } else {
@@ -319,12 +319,13 @@ export default class extends React.Component<Props, State> {
         return <button onClick={this.startTest}>开始测试</button>;
       } else if (status === 'testing') {
         const timmer = [
+          TestType.Situps,
           TestType.RopeSkipping,
           TestType.Running1000,
           TestType.Running800,
           TestType.Running50,
         ].includes(type) ? <Timmer onUpdate={this.onTimmerUpdate}/> : null;
-        return <button onClick={this.endTest}>结束测试 ${timmer}</button>;
+        return <button onClick={this.endTest}>结束测试 {timmer}</button>;
       } else if (status === 'pending') {
       return <button disabled>正在执行...</button>;
       }

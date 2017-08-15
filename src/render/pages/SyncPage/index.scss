@@ -51,6 +51,17 @@
     border-bottom: 1px solid #e5e5e5;
     border-top: 1px solid #e5e5e5;
   }
+  .progress{
+    position: relative;
+    .prec{
+      position: absolute;
+      font-size: 30px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+    }
+  }
   .sync {
     border: 0;
     height: 90px;
@@ -84,6 +95,27 @@
     }
     span{
       font-size: 22px;
+    }
+  }
+  .faild-list {
+    flex: 1;
+    overflow: auto;
+    table{
+      width: 100%;
+      flex: 1;
+      color: #333;
+      text-align: center;
+      border-collapse: collapse;
+      font-size: 20px;
+      tr{
+        height: 90px;
+      }
+      td, th{
+        border-bottom: 1px solid #e5e5e5;
+      }
+      .score-component {
+        font-size: inherit;
+      }
     }
   }
 }

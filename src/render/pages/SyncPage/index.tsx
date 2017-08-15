@@ -8,10 +8,18 @@ import { connect } from 'react-redux';
 import { State as RootState } from '../../store';
 import actions from '../../actions';
 import Dialog from '../../components/Dialog';
+import Score from '../../components/Score';
 import URL = require('url');
+import {
+  TestRecord,
+  TestName,
+} from '../../../constants';
 import {
   bindMethod,
 } from '../../../lib/utils';
+import {
+  getDateString,
+} from '../../../lib/date';
 import './index.scss';
 type Device = {
   name: string,
@@ -22,6 +30,7 @@ type Props = RouteComponentProps<{}>& {
 }
 
 type State = {
+  faildRecords: TestRecord[],
   devices: Device[],
   selectedType: 'http' | 'bluetooth',
   uploadUrl: string | null,
@@ -40,6 +49,7 @@ export class SyncPage extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      faildRecords: [],
       devices: [],
       uploadUrl: props.uploadUrl,
       selectedType: 'http',
@@ -82,7 +92,8 @@ export class SyncPage extends React.Component<Props, State> {
       uploading: true,
       error: false,
     });
-    this.setState({ updateProgress })
+    this.setState({ updateProgress });
+    const faildRecords: TestRecord[] = [];
     try {
       await RecordService('sync')((t, p, u) => {
         updateProgress = Object.assign({}, updateProgress, {
@@ -92,7 +103,11 @@ export class SyncPage extends React.Component<Props, State> {
         this.setState({ updateProgress })
         processed = p;
         uploaded = u;
-      }, address, type);
+      },
+      (record) => {
+        faildRecords.push(record);
+      },
+      address, type);
     } catch (e) {
       updateProgress = Object.assign({}, updateProgress, {
         error: true,
@@ -102,11 +117,17 @@ export class SyncPage extends React.Component<Props, State> {
       uploading: false,
       showDialog: true,
     });
-    if (processed !== uploaded) {
-      updateProgress.error = '部分数据上传失败';
-      updateProgress.showDialog = true;
+    if (faildRecords.length) {
+      updateProgress = Object.assign({}, updateProgress, {
+        showDialog: false,
+      });
+      this.setState({
+        faildRecords,
+        updateProgress,
+      });
+    } else {
+      this.setState({ updateProgress });
     }
-    this.setState({ updateProgress });
   }
 
   renderDeviceList() {
@@ -156,7 +177,10 @@ export class SyncPage extends React.Component<Props, State> {
        searchingBluetoothDevices,
     } = this.state;
     if (updateProgress.uploading) {
-      return <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
+      return <div className="progress">
+        <span className="prec">上传进度 {updateProgress.total ? Math.round(updateProgress.processed / updateProgress.total * 100) : 0}%</span>
+        <progress className="sync" max={updateProgress.total} value={updateProgress.processed} />
+      </div>;
     } else if (this.state.selectedType === 'http') {
       if (!this.isUrlValid(uploadUrl)) {
         return <button className="sync" disabled>地址设置不正确，暂不能上传</button>
@@ -205,8 +229,51 @@ export class SyncPage extends React.Component<Props, State> {
     });
   }
 
+  renderFaildPage() {
+    const { faildRecords } = this.state;
+    return <div className="sync-page">
+      <NavigationBar onBack={() => {
+        this.setState({
+          faildRecords: [],
+        });
+       }}>
+        <Title>以下数据上传失败</Title>
+      </NavigationBar>
+      <div className="faild-list">
+        <table>
+          <thead>
+            <tr>
+              <td>项目</td>
+              <td>姓名</td>
+              <td>学号</td>
+              <td>成绩</td>
+              <td>测试时间</td>
+            </tr>
+          </thead>
+          <tbody>
+            {faildRecords.map((r, i) => {
+              return <tr key={i}>
+                <td>{TestName[r.test.type]}</td>
+                <td>{r.student.name}</td>
+                <td>{r.student.nu}</td>
+                <td><Score data={r.test.score} type={r.test.type}/></td>
+                <td>{getDateString(r.date)}</td>
+              </tr>
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>;
+  }
+
   render() {
-    const { selectedType } = this.state;
+    const {
+      selectedType,
+      faildRecords,
+    } = this.state;
+    if (faildRecords.length) {
+      return this.renderFaildPage();
+    }
     return <div className="sync-page">
       <NavigationBar onBack={this.onCancel}>
         <Title>同步</Title>

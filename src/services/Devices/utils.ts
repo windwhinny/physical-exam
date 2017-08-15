@@ -99,6 +99,7 @@ function timeStr(str: string): string {
 }
 
 export function transformScore(type: TestType, data: string): string {
+  if (data.includes('eee') || data.includes('EEE')) return 'error';
   switch (type) {
     case TestType.Running1000:
     case TestType.Running800:

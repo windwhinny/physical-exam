@@ -10,6 +10,7 @@ import {
   bindMethod,
   throttle,
 } from '../../../lib/utils';
+import CardReader from '../../services/CardReader';
 require('./index.scss');
 
 type Props =  RouteComponentProps<{}> & {
@@ -17,6 +18,7 @@ type Props =  RouteComponentProps<{}> & {
   pending: boolean,
   error: Error | null,
   keyword: string,
+  pinCode: string | null,
 }
 
 class SearchPage extends React.Component<Props, void> {
@@ -32,19 +34,37 @@ class SearchPage extends React.Component<Props, void> {
   }
 
   componentDidMount() {
+    const { pinCode, keyword } = this.props;
     const input = this.refs.input as HTMLInputElement;
     if (!input) return;
     input.focus();
+    if (pinCode) {
+      CardReader('read')(pinCode, student => {
+        student.nu
+        if (keyword === student.nu) return;
+        this.search(student.nu);
+      }, err => {
+        console.error(err);
+      });
+    }
   }
 
-  search(e: React.ChangeEvent<HTMLInputElement>) {
-    const keyword = e.target.value;
+  componentWillUnmount() {
+    CardReader('stopRead')();
+  }
+
+  search(keyword: string) {
     actions.setSearchKeyword(keyword);
     if (keyword) {
       this.searchAction(keyword);
     } else {
       actions.clearSearchResult();
     }
+  }
+
+  onSearch(e: React.ChangeEvent<HTMLInputElement>) {
+    const keyword = e.target.value;
+    this.search(keyword);
   }
 
   render() {
@@ -54,7 +74,7 @@ class SearchPage extends React.Component<Props, void> {
         <NavigationBar mode="fusion">
           <Title>
             <SearchIcon />
-            <input placeholder="姓名/学号" onChange={this.search} ref="input" value={keyword}/>
+            <input placeholder="姓名/学号" onChange={this.onSearch} ref="input" value={keyword}/>
           </Title>
           <Action>
             <div className="cancel" onClick={this.onCancel}>取消</div>
@@ -85,5 +105,7 @@ class SearchPage extends React.Component<Props, void> {
 
 export default connect((state: RootState) => {
   const page = state.searchPage;
-  return page;
+  return Object.assign({}, page, {
+    pinCode: state.app.pinCode,
+  });
 })(SearchPage);

@@ -69,7 +69,7 @@ export const TestUnitTemp = {
   [TestType.VitalCapacity]: '$0 ml',
   [TestType.SitAndReach]: '$0 cm',
   [TestType.PullUp]: '$0 次',
-  [TestType.RunningBackAndForth]: '$2 秒',
+  [TestType.RunningBackAndForth]: '$1 圈，$2 秒',
   [TestType.HeightAndWeight]: '$0 cm, $1 kg',
   [TestType.MedicineBall]: '$0 米',
 }
@@ -124,6 +124,7 @@ export enum ScoreType {
 export type Score = {
   type: ScoreType,
   data: string,
+  final: boolean,
 }
 
 export enum Gender {
@@ -142,6 +143,7 @@ export interface RecordService {
   getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(
     onProgress: (t: number, c: number, u: number) => void,
+    onError: (record: TestRecord) => void,
     url: string,
     type: 'bluetooth' | 'http',
   ): Promise<void>;

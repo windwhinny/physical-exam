@@ -1,4 +1,7 @@
 .score-component{
   font-size: 30px;
   color: #333;
+  .value.error{
+    color: #ff5454;
+  }
 }

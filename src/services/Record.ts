@@ -107,8 +107,9 @@ class RecordService implements RecordServiceInterface {
         let pos = records.map(r => {
           const po = this.transform(r)
           po.uuid = uuid.v4();
+          if (po.score === 'error') return null;
           return po;
-        });
+        }).filter(Boolean) as RecordPO[];
         pos = await this.model.insertMulti(pos, t) as RecordPO[];
         return pos.map(p => this.reverse(p));
       })()];
@@ -314,6 +315,7 @@ class RecordService implements RecordServiceInterface {
 
   async sync(
     onProgress: (t: number, c: number, r: number) => void,
+    onError: (record: TestRecord) => void,
     address: string,
     type: 'bluetooth' | 'http',
   ): Promise<void> {
@@ -355,8 +357,10 @@ class RecordService implements RecordServiceInterface {
           result = await this.bluetoothSync(address, rs, (total as any)[0].count, uploaded);
         }
         await update(rs);
+        onError(this.reverse(rs));
         uploaded++;
       } catch (e) {
+        onError(this.reverse(rs));
         console.error(e);
       }
       proccessed++;

@@ -64,9 +64,11 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
       type = ScoreType.Final;
     }
 
+    const score = transformScore(testType, asciiToString(f.data.slice(5, f.data.length)));
     return {
       type,
-      data: transformScore(testType, asciiToString(f.data.slice(5, f.data.length))),
+      data: score,
+      final: f.data[5] === 'J'.charCodeAt(0)
     }
   }
 
