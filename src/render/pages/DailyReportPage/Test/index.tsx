@@ -103,6 +103,7 @@ export default class extends React.Component<Props, State> {
     }
     const records = deviceList.map((d, index) => {
       if (!d.score) return null;
+      if (d.score.data === 'error') return null;
       const student = students[index];
       if (!student) return null;
       return {

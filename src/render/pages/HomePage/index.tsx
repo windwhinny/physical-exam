@@ -44,7 +44,7 @@ class HomePage extends React.Component<Props, State> {
   render() {
     const {
       date,
-      // mode
+      mode
     } = this.props;
 
     return <div className="home-page">
@@ -72,11 +72,11 @@ class HomePage extends React.Component<Props, State> {
         <CalendarScroller date={date} onSelectedDateChanged={actions.updateSelectedDate}/>
       </header>
       <TestCategory />
-      {/*{mode === 'normal' ?
+      {mode === 'normal' ?
         <button className="mode normal" onClick={() => this.setMode('midterm')}>当前为普通测试，切换为中考模式</button>
         :
         <button className="mode midterm" onClick={() => this.setMode('normal')}>当前为中考模式，切换为普通模式</button>
-      }*/}
+      }
     </div>;
   }
 }
