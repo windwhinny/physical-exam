@@ -12,10 +12,12 @@ import './index.scss'
 
 type Props = RouteComponentProps<{}> & {
   pinCode: string | null,
+  round: number,
 }
 
 type State = {
   pinCode: string | null,
+  round: number,
 }
 
 class SettingPage extends React.Component<Props, State> {
@@ -23,13 +25,20 @@ class SettingPage extends React.Component<Props, State> {
     super(props);
     this.state = {
       pinCode: props.pinCode,
+      round: props.round,
     }
-    bindMethod(this, ['onSubmit', 'pinCodeOnChange', 'onCancel']);
+    bindMethod(this, ['onSubmit', 'pinCodeOnChange', 'onCancel', 'roundOnChange']);
   }
 
   onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const { round } = this.state;
     event.preventDefault();
     actions.AppUpdatePinCode(this.state.pinCode as string);
+    if (round <= 0 || isNaN(round)) {
+      actions.AppUpdateTestRound(1);
+    } else {
+      actions.AppUpdateTestRound(this.state.round);
+    }
     this.onCancel();
   }
 
@@ -39,12 +48,19 @@ class SettingPage extends React.Component<Props, State> {
     });
   }
 
+  roundOnChange(event: React.ChangeEvent<HTMLInputElement>) {
+    let round = Number(event.currentTarget.value);
+    this.setState({
+      round,
+    });
+  }
+
   onCancel() {
     this.props.history.goBack();
   }
 
   render() {
-    const { pinCode } = this.state;
+    const { pinCode, round } = this.state;
 
     return <div className="setting-page">
       <NavigationBar onBack={this.onCancel}>
@@ -59,6 +75,10 @@ class SettingPage extends React.Component<Props, State> {
             <p className="field-name">读卡器 PIN 码</p>
             <input name="pinCode" placeholder="请输入 PIN 码" value={pinCode || ''} onChange={this.pinCodeOnChange}/>
           </label>
+          <label>
+            <p className="field-name">测试轮数</p>
+            <input name="round" placeholder="请输入数字" value={round || ''} type="number" onChange={this.roundOnChange}/>
+          </label>
         </fieldset>
         <div className="actions">
           <button type="submit" className="btn">保存</button>
@@ -71,5 +91,6 @@ class SettingPage extends React.Component<Props, State> {
 export default connect((state: RootState) => {
   return {
     pinCode: state.app.pinCode,
+    round: state.app.testRound,
   };
 })(SettingPage);

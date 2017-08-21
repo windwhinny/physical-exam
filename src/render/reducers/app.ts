@@ -6,7 +6,9 @@ import {
   AppUpdatePinCodeAction,
   AppChangeModeAction,
   AppSetUploadUrlAction,
-  APP_SET_UPLOAD_URL
+  APP_SET_UPLOAD_URL,
+  APP_UPDATE_TEST_ROUND,
+  AppUpdateTestRoundAction,
 } from '../actions/app';
 import {
   getReturnVal,
@@ -19,6 +21,7 @@ export type AppState = {
   mode: string,
   pinCode: string | null,
   uploadUrl: string | null,
+  testRound: number,
 }
 
 export default function(
@@ -28,8 +31,15 @@ export default function(
     mode: localStorage.getItem('mode') || 'normal',
     pinCode: localStorage.getItem('pin-code') || null,
     uploadUrl: localStorage.getItem('upload-url') || null,
+    testRound: Number(localStorage.getItem('testRound')) || 1,
   },
-  action: typeof loginOrLogoutAction | AppChangeModeAction | AppUpdatePinCodeAction | AppSetUploadUrlAction): AppState {
+  action: typeof
+    loginOrLogoutAction
+    | AppChangeModeAction
+    | AppUpdatePinCodeAction
+    | AppSetUploadUrlAction
+    | AppUpdateTestRoundAction
+  ): AppState {
   switch (action.type) {
     case APP_INIT: {
       const ac = action as typeof loginOrLogoutAction;
@@ -70,6 +80,13 @@ export default function(
       localStorage.setItem('mode', ac.mode);
       return Object.assign({}, state, {
         mode: ac.mode,
+      });
+    }
+    case APP_UPDATE_TEST_ROUND: {
+      const ac = action as AppUpdateTestRoundAction;
+      localStorage.setItem('testRound', String(ac.round));
+      return Object.assign({}, state, {
+        testRound: ac.round,
       });
     }
   }

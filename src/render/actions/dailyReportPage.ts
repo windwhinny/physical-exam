@@ -104,11 +104,12 @@ const DRPStartTestRV = getReturnVal(DRPStartTest);
 export type DRPStartTestAction = typeof DRPStartTestRV;
 
 export const DRP_END_TEST = 'DRP_END_TEST';
-export const DRPEndTest = (type: TestType) => {
+export const DRPEndTest = (type: TestType, maxRound: number) => {
   return {
     type: DRP_END_TEST,
     promise: new ActionPromise(Device('endTest')()),
     testType: type,
+    maxRound,
   }
 };
 const DRPEndTestRV = getReturnVal(DRPEndTest);

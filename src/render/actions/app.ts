@@ -35,3 +35,11 @@ export const AppSetUploadUrl = (url: string) => ({
 });
 const SetUploadUrlRV = getReturnVal(AppSetUploadUrl);
 export type AppSetUploadUrlAction = typeof SetUploadUrlRV;
+
+export const APP_UPDATE_TEST_ROUND = 'APP_UPDATE_TEST_ROUND';
+export const AppUpdateTestRound = (round: number) => ({
+  type: APP_UPDATE_TEST_ROUND,
+  round,
+});
+const UpdateTestRoundRV = getReturnVal(AppUpdateTestRound);
+export type AppUpdateTestRoundAction = typeof UpdateTestRoundRV;

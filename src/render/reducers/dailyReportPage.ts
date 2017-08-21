@@ -31,7 +31,6 @@ import {
   Pagination,
   Student,
   Score,
-  TestType,
 } from '../../constants';
 import handlePromise from './handlePromise';
 
@@ -166,13 +165,10 @@ const testReducer = (
             status: 'pending',
           });
         case 'resolved':
-          /*
-            肺活量测试需要有两轮测试，
-            所以在结束测试的时候，将两轮测试成绩合并，取最优的成绩
-          */
-          const round = ac.testType !== TestType.VitalCapacity || state.round === 2 ? 0 : state.round;
+          const maxRound = ac.maxRound;
+          const round = state.round < maxRound ? state.round : 0;
           let deviceList = state.deviceList;
-          if (round === 0 && ac.testType === TestType.VitalCapacity) {
+          if (round > 0) {
             deviceList = state.deviceList.map(device => {
               const temp = state.tempRecords.find(d => d.deviceNo === device.deviceNo);
               if (!temp) return device;

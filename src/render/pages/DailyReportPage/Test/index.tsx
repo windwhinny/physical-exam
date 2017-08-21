@@ -26,6 +26,7 @@ export type Props = {
   ip: string | null,
   mode: string,
   pinCode: string | null,
+  maxRound: number,
 } & TestState;
 
 type State = {
@@ -46,7 +47,7 @@ export default class extends React.Component<Props, State> {
       'endTest',
       'saveTest',
       'onTimmerUpdate',
-      'startNextRound']);
+      'prepareNextRound']);
   }
 
   componentWillUnmount( ) {
@@ -124,7 +125,7 @@ export default class extends React.Component<Props, State> {
     actions.DRPSaveTestResult(this.genRecords());
   }
 
-  async startNextRound() {
+  async prepareNextRound() {
     const { deviceList } = this.props;
     const temp = deviceList.map(d => {
       if (!d.score) return null;
@@ -137,7 +138,7 @@ export default class extends React.Component<Props, State> {
       score: Score,
     }[];
     actions.DRPSaveTempScore(temp);
-    this.startTest();
+    this.prepareTest();
   }
 
   onTimmerUpdate(d: Date) {
@@ -189,7 +190,7 @@ export default class extends React.Component<Props, State> {
   }
 
   async endTest() {
-    const { type } = this.props;
+    const { type, maxRound } = this.props;
     // 结束测试时，再获取一次成绩
     await Promise.all(
       this.props
@@ -198,7 +199,7 @@ export default class extends React.Component<Props, State> {
             return actions.DRPGetScore(type, d.deviceNo).promise.originPromise;
           }));
     requestAnimationFrame(() => {
-      actions.DRPEndTest(type);
+      actions.DRPEndTest(type, maxRound);
     });
   }
 
@@ -294,13 +295,14 @@ export default class extends React.Component<Props, State> {
       type,
       round,
       mode,
+      maxRound,
     } = this.props;
     const renderButton = () => {
       if (!deviceList.length) {
         return null
       } else if (status === 'idle') {
-        if (type === TestType.VitalCapacity && round === 1) {
-          return <button onClick={this.startNextRound}>开始二轮测试</button>;
+        if (round > 0 && round < maxRound) {
+          return <button onClick={this.prepareNextRound}>准备第 {round + 1} 轮测试</button>;
         } else if (deviceList.find(d => !!d.score) && students.length) {
           // return <button onClick={this.saveTest}>保存测试成绩</button>;
           if (mode === 'normal') {

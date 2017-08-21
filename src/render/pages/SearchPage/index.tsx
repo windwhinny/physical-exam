@@ -26,7 +26,7 @@ class SearchPage extends React.Component<Props, void> {
   constructor(props: Props) {
     super(props);
     this.searchAction = throttle(actions.searchStudent, 300);
-    bindMethod(this, ['search', 'onCancel']);
+    bindMethod(this, ['search', 'onCancel', 'onSearch']);
   }
 
   onCancel() {

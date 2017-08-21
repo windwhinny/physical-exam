@@ -196,6 +196,7 @@ export default connect((state: RootState) => {
       pinCode: state.app.pinCode,
       type: testType,
       mode: state.app.mode,
+      maxRound: state.app.testRound,
     }),
   });
 })(DailyReportPage);
