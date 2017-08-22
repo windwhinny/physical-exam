@@ -25,8 +25,8 @@ class SearchPage extends React.Component<Props, void> {
   searchAction: (k: string) => void;
   constructor(props: Props) {
     super(props);
-    this.searchAction = throttle(actions.searchStudent, 300);
     bindMethod(this, ['search', 'onCancel', 'onSearch']);
+    this.doSearch = throttle(this.doSearch, 300);
   }
 
   onCancel() {
@@ -53,13 +53,17 @@ class SearchPage extends React.Component<Props, void> {
     CardReader('stopRead')();
   }
 
-  search(keyword: string) {
-    actions.setSearchKeyword(keyword);
+  doSearch(keyword: string) {
     if (keyword) {
-      this.searchAction(keyword);
+      actions.searchStudent(keyword);
     } else {
       actions.clearSearchResult();
     }
+  }
+
+  search(keyword: string) {
+    actions.setSearchKeyword(keyword);
+    this.doSearch(keyword);
   }
 
   onSearch(e: React.ChangeEvent<HTMLInputElement>) {
