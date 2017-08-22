@@ -64,6 +64,13 @@ export default class extends React.Component<Props, State> {
   componentWillReceiveProps(props: Props) {
     switch (props.status) {
       case 'idle': {
+        if (
+          props.round === 0
+          && props.deviceList.length
+          && props.students.length !== props.deviceList.length
+        ) {
+          play(`./audios/inputStudentNo.mp3`);
+        }
         if (this.readingCard) break;
         this.readingCard = true;
         if (props.pinCode) {
@@ -163,15 +170,34 @@ export default class extends React.Component<Props, State> {
     const {
       deviceList,
       type,
+      round,
+      maxRound,
     } = this.props;
-    if ([
+    debugger;
+    if (maxRound > 1) {
+      if (round < 4 ) {
+        await play(`./audios/round${round + 1}Test.mp3`);
+      } else {
+        await play('./audios/begin.mp3');
+      }
+    } else if ([
       TestType.Running1000,
       TestType.Running800,
       TestType.Running50,
       TestType.RunningBackAndForth,
     ].includes(this.props.type)) {
       await play('./audios/prepare_run.mp3');
-    } else if (TestType.HeightAndWeight !== this.props.type) {
+    } else if ([
+      TestType.Situps,
+      TestType.PullUp
+    ].includes(this.props.type)) {
+      await play('./audios/prepareTest.mp3');
+      play('./audios/du.mp3');
+    } else if (TestType.RopeSkipping === this.props.type) {
+      await play('./audios/inPosition.mp3');
+      await play('./audios/prepareTest.mp3');
+      play('./audios/du.mp3');
+    } else {
       await play('./audios/begin.mp3');
     }
     await actions.DRPStartTest().promise.originPromise;
@@ -190,7 +216,7 @@ export default class extends React.Component<Props, State> {
   }
 
   async endTest() {
-    const { type, maxRound } = this.props;
+    const { type, round, maxRound } = this.props;
     // 结束测试时，再获取一次成绩
     await Promise.all(
       this.props
@@ -200,6 +226,11 @@ export default class extends React.Component<Props, State> {
           }));
     requestAnimationFrame(() => {
       actions.DRPEndTest(type, maxRound);
+      if (round === maxRound) {
+        play('./audios/endTest.mp3').then(() => {
+          play('./audios/saveRecord.mp3');
+        });
+      }
     });
   }
 
