@@ -67,8 +67,8 @@ export default class CalendarScroler extends React.Component<Props, State> {
   generateDates(): Date[] {
     const { date } = this.props;
     const dates: Date[] = [];
-    const start = new Date(date.getTime() - oneDay * 4)
-    const end = new Date(date.getTime() + oneDay * 4)
+    const start = new Date(date.getTime() - oneDay * 5)
+    const end = new Date(date.getTime() + oneDay * 5)
     let d = start;
     while (d <= end) {
       dates.push(d);
@@ -81,7 +81,6 @@ export default class CalendarScroler extends React.Component<Props, State> {
     } else if (!activeStart) {
       this.getActiveDates(dates);
     }
-
     return dates;
   }
 

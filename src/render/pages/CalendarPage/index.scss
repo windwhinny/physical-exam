@@ -5,8 +5,19 @@
   bottom: 0;
   right: 0;
   display: flex;
-  flex-direction: column;
+  h1{
+    font-size: 30px;
+    padding: 0 15px;
+    color: white;
+    font-weight: normal;
+  }
+  >section{
+    flex: 1;
+    max-width: 880px;
+  }
   header{
+    flex: 400px;
+    min-width: 400px;
     background: linear-gradient(to bottom, #6677ff, #48a2ff);
   }
   .navigation-bar{

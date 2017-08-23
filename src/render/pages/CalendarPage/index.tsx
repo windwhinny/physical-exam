@@ -2,7 +2,7 @@ import React = require('react');
 import { State as RootState } from '../../store';
 import { connect } from 'react-redux';
 import Calendar from '../../components/Calendar';
-import NavigationBar, { Title, Action } from '../../components/NavigationBar';
+import NavigationBar, { Action } from '../../components/NavigationBar';
 import { RouteComponentProps } from 'react-router';
 import TestCategoryTab from '../../components/TestCategory/Tab'
 import SearchIcon from '../../components/SearchIcon';
@@ -114,21 +114,21 @@ class CalendarPage extends React.Component<Props, State> {
     return <div className="calendar-page">
       <header>
         <NavigationBar onBack={history.goBack} mode="fusion">
-          <Title>
-            {this.renderMonth()}
-          </Title>
           <Action>
             <Link to="/search"><SearchIcon/></Link>
           </Action>
         </NavigationBar>
+        <h1>{this.renderMonth()}</h1>
         <Calendar date={date}
           onSelectedDateChanged={this.updateSelectedDate}
           onHoveredMonthChanged={this.updateMonth}
           activeMonth={activeMonth}
           />
       </header>
-      <TestCategoryTab active={type} onSelect={this.onSelect}/>
-      <TestResult records={records} type={type} onScrollToBottom={this.onScrollToBottom}/>
+      <section>
+        <TestCategoryTab active={type} onSelect={this.onSelect}/>
+        <TestResult records={records} type={type} onScrollToBottom={this.onScrollToBottom}/>
+      </section>
     </div>;
   }
 }

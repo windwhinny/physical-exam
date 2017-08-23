@@ -35,7 +35,7 @@ document.addEventListener('keydown', (e: KeyboardEvent) => {
 });
 
 function setRem() {
-  const rem = document.documentElement.clientWidth * 75 / 800;
+  const rem = document.documentElement.clientWidth * 75 / 1280;
   document.documentElement.style.fontSize = `${rem}px`;
 }
 

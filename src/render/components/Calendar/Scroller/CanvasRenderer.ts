@@ -17,8 +17,8 @@ export type Cell = {
   y: number,
 }
 
-const layout = [100, 100, 100, 100, 140, 100, 100, 100, 100];
-const layoutWidth = 800;
+const layout = [100, 100, 100, 100, 100, 140, 100, 100, 100, 100, 100];
+const layoutWidth = 1280;
 const layoutHeigh = 170;
 const start = (layoutWidth - layout.reduce((r, n) => r + n, 0)) / 2;
 // const end = layoutWidth - start;
@@ -85,13 +85,13 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
     });
 
     ctx.clearRect(
-      (400 + start) * this.scale,
+      (500 + start) * this.scale,
       0,
       140 * this.scale,
       layoutHeigh * this.scale,
     );
 
-    const centerX = (470 + start) * this.scale;
+    const centerX = (570 + start) * this.scale;
     const centerY = 70 * this.scale;
 
     this.drawCircle(
@@ -115,7 +115,7 @@ export default class CanvasRenderer extends BaseCanvasRenderer {
       family: this.options.style.fontFamily,
       weight: this.options.style.fontWeight,
     });
-    dates.slice(3, 6).forEach((d, i) => {
+    dates.slice(4, 7).forEach((d, i) => {
       this.drawText(
         String(d.getDate()),
         (i - 1) * 100 * this.scale  + centerX + offset,
