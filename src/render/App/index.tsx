@@ -11,6 +11,7 @@ import DailyReportPage from '../pages/DailyReportPage';
 import SettingPage from '../pages/SettingPage';
 import CalendarPage from '../pages/CalendarPage';
 import SyncPage from '../pages/SyncPage';
+import TestSettingPage from '../pages/SettingPage/TestSettingPage';
 import { history } from '../store';
 import actions from '../actions';
 import { connect } from 'react-redux';
@@ -39,6 +40,7 @@ class App extends React.Component<Props, State> {
       <div id="routes">
         <Route path="/" exact component={HomePage as any}/>
         <Route path="/settings" exact component={SettingPage as any}/>
+        <Route path="/settings/test" component={TestSettingPage as any} />
         <Route path="/calendar" component={CalendarPage as any} />
         <Route path="/search" component={SearchPage as any} />
         <Route path="/student" component={StudentPage as any} />

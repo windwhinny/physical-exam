@@ -1,10 +1,11 @@
 import React = require('react');
 import { connect } from 'react-redux';
-import NavigationBar, { Title, Action } from '../../components/NavigationBar';
+import NavigationBar, { Title } from '../../components/NavigationBar';
 import { State as RootState } from '../../reducers';
 import actions from '../../actions';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
+import Arrow from '../../components/Arrow';
 import {
   bindMethod,
 } from '../../../lib/utils';
@@ -60,25 +61,24 @@ class SettingPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { pinCode, round } = this.state;
+    const { pinCode } = this.state;
 
     return <div className="setting-page">
       <NavigationBar onBack={this.onCancel}>
         <Title>设置</Title>
-        <Action>
-          <Link to="/sync">同步数据</Link>
-        </Action>
       </NavigationBar>
       <form onSubmit={this.onSubmit}>
         <fieldset>
-          <label>
+          <label className="row space-between">
             <p className="field-name">读卡器 PIN 码</p>
             <input name="pinCode" placeholder="请输入 PIN 码" value={pinCode || ''} onChange={this.pinCodeOnChange}/>
           </label>
-          <label>
+          <Link className="row space-between" to="/sync">同步数据<Arrow/></Link>
+          <Link className="row space-between" to="/settings/test">测试设置<Arrow/></Link>
+          {/* <label>
             <p className="field-name">测试轮数</p>
             <input name="round" placeholder="请输入数字" value={round || ''} type="number" onChange={this.roundOnChange}/>
-          </label>
+          </label> */}
         </fieldset>
         <div className="actions">
           <button type="submit" className="btn">保存</button>

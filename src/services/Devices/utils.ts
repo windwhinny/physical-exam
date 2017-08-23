@@ -1,6 +1,7 @@
 import SerialPort = require('serialport');
 import {
   TestType,
+  DeviceConfig,
 } from '../../constants';
 
 export type Frame = {
@@ -111,4 +112,22 @@ export function transformScore(type: TestType, data: string): string {
     default:
       return String(Number(data));
   }
+}
+
+export function transformConfig(type: TestType, config: DeviceConfig) {
+  const { testTime, runningRound } = config;
+  switch (type) {
+    case TestType.Running1000:
+    case TestType.Running800:
+      if (!runningRound) return null;
+      return String(100 + runningRound).slice(1) + '3031020';
+    case TestType.Situps:
+    case TestType.RopeSkipping:
+      if (!testTime) return null;
+      const min = Math.floor(testTime / 60);
+      const sec = testTime % 60;
+
+      return String(100 + min).slice(1) + String(100 + sec).slice(1);
+  }
+  return null;
 }

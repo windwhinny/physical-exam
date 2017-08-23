@@ -5,6 +5,8 @@ import {
   TestRecord,
   Score,
   Student,
+  DeviceConfig,
+  testSettings,
 } from '../../../../constants';
 import actions from '../../../actions';
 import {
@@ -58,7 +60,34 @@ export default class extends React.Component<Props, State> {
 
   componentDidMount() {
     actions.DRPClearTest();
-    actions.DRPSearchDevices(this.props.type);
+    const {type} = this.props;
+    let config: DeviceConfig | undefined;
+    const testSettingsValue = testSettings[type];
+    if (testSettingsValue) {
+      if ([
+        TestType.Running1000,
+        TestType.Running800,
+      ].includes(type)) {
+        config = {
+          runningRound: testSettingsValue,
+        }
+      } else if ([
+        TestType.Situps,
+        TestType.RopeSkipping,
+      ].includes(type)) {
+        config = {
+          testTime: testSettingsValue,
+        }
+      }
+    }
+    if ([
+      TestType.StandingLongJump,
+      TestType.VitalCapacity,
+      TestType.SitAndReach,
+    ].includes(type)) {
+      actions.AppUpdateTestRound(testSettingsValue || 1);
+    }
+    actions.DRPSearchDevices(type, config);
   }
 
   componentWillReceiveProps(props: Props) {
@@ -82,6 +111,13 @@ export default class extends React.Component<Props, State> {
         }
         break;
       }
+      case 'testing':
+        if (props.deviceList.every(d => {
+          if (!d.score) return false;
+          return d.score.final === true || d.score.data === 'error';
+        })) {
+          this.endTest();
+        }
       default: {
         if (!this.readingCard) break;
         this.readingCard = false;
@@ -150,10 +186,11 @@ export default class extends React.Component<Props, State> {
 
   onTimmerUpdate(d: Date) {
     const { status, type } = this.props;
+    const testSettingsValue = testSettings[type];
     if (status !== 'testing') return;
     if (![TestType.RopeSkipping, TestType.Situps].includes(type)) return;
     const seconds = d.getMinutes() * 60 + d.getSeconds() + (d.getMilliseconds() / 1000);
-    const left = 60 - seconds;
+    const left = testSettingsValue - seconds;
     if (left < 11 && left > 0) {
       play(`./audios/${Math.floor(left)}.mp3`);
     } else if (left <= 0) {
@@ -173,7 +210,7 @@ export default class extends React.Component<Props, State> {
       round,
       maxRound,
     } = this.props;
-    debugger;
+
     if (maxRound > 1) {
       if (round < 4 ) {
         await play(`./audios/round${round + 1}Test.mp3`);

@@ -89,6 +89,21 @@ export const TestCode = {
   [TestType.MedicineBall]: 'SX',
 }
 
+export const testSettings = {
+  [TestType.Situps]: 60,
+  [TestType.RopeSkipping]: 60,
+  [TestType.Running1000]: 5,
+  [TestType.Running800]: 4,
+  [TestType.StandingLongJump]: 3,
+  [TestType.VitalCapacity]: 3,
+  [TestType.SitAndReach]: 3,
+};
+
+export type DeviceConfig = {
+  testTime?: number,
+  runningRound?: number,
+}
+
 export type Student = {
   name: string,
   nu: string,
@@ -156,6 +171,7 @@ export interface DeviceManagerService {
   startTest(): Promise<null | true>;
   endTest(): Promise<null | true>;
   setTestType(type: TestType): Promise<null | true>;
+  updateDeviceConfig(type: TestType, config: DeviceConfig): Promise<null>;
   getDeviceList(): Promise<string[]>;
   getMaxDeviceNo(): Promise<string | null>;
 }

@@ -1,0 +1,23 @@
+.counter{
+  display: flex;
+  align-items: center;
+  .minues{
+    &:before{
+      border-right: 10px solid #5393ff;
+    }
+  }
+  .plus{
+    &:before{
+      border-left: 10px solid #5393ff;
+    }
+  }
+  .plus, .minues{
+    padding: 20px;
+    &:before{
+      content: ' ';
+      display: block;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+    }
+  }
+}

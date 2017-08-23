@@ -7,6 +7,7 @@ import {
   Frame,
   asciiToString,
   transformScore,
+  transformConfig,
 } from './utils';
 import {
   TestType,
@@ -14,6 +15,7 @@ import {
   DeviceManagerService,
   Score,
   ScoreType,
+  DeviceConfig,
 } from '../../constants';
 import serviceIPCRegistor from '../registor';
 
@@ -82,6 +84,15 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
     if (!this.deviceCont) return null;
     await this.deviceCont.sendAndAwait('TS');
     return true;
+  }
+
+  async updateDeviceConfig(type: TestType, config: DeviceConfig) {
+    if (!this.deviceCont) return null;
+    const data = transformConfig(type, config);
+    if (data) {
+      await this.deviceCont.sendAndAwait('PT', data);
+    }
+    return null;
   }
 
   async setTestType(type: TestType): Promise<null | true> {
@@ -183,7 +194,6 @@ class DeviceConnector extends Event.EventEmitter {
     return new Promise((resolve, reject) => {
       const cb = (_data: number[]) => {
         const f = receiveFrame(Buffer.from(_data));
-        console.log(f);
         if (!f) return;
         if (f.cmd.toLowerCase() === 'rr') {
           setTimeout(() => {

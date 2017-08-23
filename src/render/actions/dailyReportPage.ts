@@ -10,6 +10,7 @@ import {
   Student,
   TestRecord,
   Score,
+  DeviceConfig,
 } from '../../constants';
 
 export const DRP_LOAD_RECORDS = 'DRP_LOAD_RECORDS';
@@ -47,7 +48,7 @@ export const DRPClearTest = () => ({
 });
 
 export const DRP_SEARCH_DEVICES = 'DRP_SEARCH_DEVICES';
-export const DRPSearchDevices = (type: TestType) => {
+export const DRPSearchDevices = (type: TestType, config?: DeviceConfig) => {
   const promise = Device('searchRF')().then(() => {
     return Device('setTestType')(type);
   })
@@ -58,6 +59,13 @@ export const DRPSearchDevices = (type: TestType) => {
     return list.map(item => ({
       deviceNo: item,
     }));
+  })
+  .then(devices => {
+    if (devices.length && config) {
+      return Device('updateDeviceConfig')(type, config).then(() => devices);
+    } else {
+      return devices;
+    }
   });
   return {
     type: DRP_SEARCH_DEVICES,

@@ -31,7 +31,7 @@ export default function(
     mode: localStorage.getItem('mode') || 'normal',
     pinCode: localStorage.getItem('pin-code') || null,
     uploadUrl: localStorage.getItem('upload-url') || null,
-    testRound: Number(localStorage.getItem('testRound')) || 1,
+    testRound: 1,
   },
   action: typeof
     loginOrLogoutAction
@@ -70,7 +70,11 @@ export default function(
     }
     case APP_UPDATE_PIN_CODE: {
       const ac = action as AppUpdatePinCodeAction;
-      localStorage.setItem('pin-code', ac.pinCode);
+      if (ac.pinCode) {
+        localStorage.setItem('pin-code', ac.pinCode);
+      } else {
+        localStorage.removeItem('pin-code');
+      }
       return Object.assign({}, state, {
         pinCode: ac.pinCode,
       });
@@ -84,7 +88,6 @@ export default function(
     }
     case APP_UPDATE_TEST_ROUND: {
       const ac = action as AppUpdateTestRoundAction;
-      localStorage.setItem('testRound', String(ac.round));
       return Object.assign({}, state, {
         testRound: ac.round,
       });
