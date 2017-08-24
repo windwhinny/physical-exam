@@ -32,6 +32,7 @@ import {
   Student,
   Score,
 } from '../../constants';
+import scoreGreatorThan from '../helpers/scoreGreatorThan';
 import handlePromise from './handlePromise';
 
 export type TestDevice = {
@@ -176,7 +177,7 @@ const testReducer = (
                 return Object.assign({}, device, {
                   score: temp.score,
                 });
-              } else if (Number(temp.score.data) > Number(device.score.data)) {
+              } else if (scoreGreatorThan(ac.testType, temp.score, device.score) > 0) {
                 return Object.assign({}, device, {
                   score: temp.score,
                 });
