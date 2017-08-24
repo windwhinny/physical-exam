@@ -120,14 +120,14 @@ export function transformConfig(type: TestType, config: DeviceConfig) {
     case TestType.Running1000:
     case TestType.Running800:
       if (!runningRound) return null;
-      return String(100 + runningRound).slice(1) + '3031020';
+      return '000' + String(100 + runningRound).slice(1) + '3031020';
     case TestType.Situps:
     case TestType.RopeSkipping:
       if (!testTime) return null;
       const min = Math.floor(testTime / 60);
       const sec = testTime % 60;
 
-      return String(100 + min).slice(1) + String(100 + sec).slice(1);
+      return '000' + String(100 + min).slice(1) + String(100 + sec).slice(1);
   }
   return null;
 }
