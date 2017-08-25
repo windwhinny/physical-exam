@@ -239,7 +239,7 @@ const testReducer = (
     case DRP_SAVE_TEMP_SCORE: {
       const ac = action as DRPSaveTempScoreAction;
       return Object.assign({}, state, {
-        tempRecords: state.tempRecords.concat(ac.records),
+        tempRecords: ac.records,
       })
     }
   }

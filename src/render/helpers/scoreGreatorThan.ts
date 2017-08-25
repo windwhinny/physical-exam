@@ -3,7 +3,6 @@ import {
   TestType,
 } from '../../constants';
 
-
 export default (type: TestType, a: Score, b: Score): number => {
   const av = a.data.split(',').map(Number) as number[];
   const bv = b.data.split(',').map(Number) as number[];
