@@ -35,6 +35,7 @@ const codeMap = {
   'ST': 'sg',
   'SX': 'sxq',
 }
+
 const fields = Object.keys(RecordModelSchema).filter(a => a !== 'sign');
 class RecordService implements RecordServiceInterface {
    model: RecordModel;
@@ -46,11 +47,49 @@ class RecordService implements RecordServiceInterface {
       const model = new RecordModel(db);
       await model.sync();
       this.model = model;
+      this.updateIndex();
     } catch (e) {
       db.close();
       throw e;
     }
   }
+
+  updateIndex() {
+    const indexes = [
+      `CREATE INDEX date ON records (
+        date,
+        item
+      );`,
+      `CREATE UNIQUE INDEX uuid ON records (
+        uuid
+      );`,
+      `CREATE INDEX stuNo ON records (
+        stuNo,
+        item
+      );`,
+      `CREATE INDEX stuNoAndName ON records (
+        stuNo,
+        stuName
+      );`,
+      `CREATE INDEX testTime ON records (
+        testTime
+      );`,
+      `CREATE INDEX synced ON records (
+        synced
+      );`
+    ];
+    // tslint:disable-next-line:no-any
+    indexes.reduce((p: Promise<any>, index) => {
+      return p.then(() => {
+        this.model.db.run({
+          text: index,
+          values: [],
+        })
+      })
+      .then(() => null, (err) => console.error(err));
+    }, Promise.resolve());
+  }
+
   private transform(r: TestRecord): RecordPO {
     const date = new Date(r.date);
     return {

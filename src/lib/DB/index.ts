@@ -1,6 +1,7 @@
 import { app } from 'electron';
 import path = require('path');
 import sqlite = require('sqlite3');
+import fs = require('fs');
 import {
   SQL,
   SimpleObject,
@@ -15,8 +16,20 @@ import BaseDB from './BaseDB';
 export default class DB extends BaseDB implements DBInterface {
   db: sqlite.Database | null;
   dbfile = path.join(app.getPath('userData'), 'data.db');
+  backupDBfile = path.join(app.getPath('userData'), 'data.db.bak');
   initPromise: Promise<sqlite.Database>;
   closed: boolean;
+
+  backup() {
+    fs.stat(this.dbfile, (err, stats) => {
+      if (err) return;
+      if (stats.isFile()) {
+        const readStream = fs.createReadStream(this.dbfile);
+        const writeStream = fs.createWriteStream(this.backupDBfile);
+        readStream.pipe(writeStream);
+      }
+    });
+  }
 
   async open(): Promise<{}>  {
     if (this.db) {
@@ -32,6 +45,7 @@ export default class DB extends BaseDB implements DBInterface {
       const _db = new sqlite.Database(this.dbfile, err => {
         if (err) return reject(err);
         this.db = _db;
+        this.backup();
         resolve();
       });
     });

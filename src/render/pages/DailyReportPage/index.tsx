@@ -130,7 +130,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
   renderBottomAction() {
     const { records } = this.props;
     if (records.length) {
-      return <Link className="sync" to="/sync">同步数据</Link>
+      return <Link className="sync" to="/sync" key={2}>同步数据</Link>
     } else {
       return null;
     }
