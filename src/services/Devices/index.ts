@@ -70,7 +70,6 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
     return {
       type,
       data: score,
-      final: f.data[5] === 'J'.charCodeAt(0)
     }
   }
 

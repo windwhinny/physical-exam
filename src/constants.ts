@@ -139,7 +139,6 @@ export enum ScoreType {
 export type Score = {
   type: ScoreType,
   data: string,
-  final: boolean,
 }
 
 export enum Gender {

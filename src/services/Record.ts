@@ -279,6 +279,13 @@ class RecordService implements RecordServiceInterface {
       testType: codeMap[record.item as keyof typeof codeMap],
       time: Math.round(record.testTime.getTime() / 1000),
       score: transformRecord(),
+      height: undefined as string | undefined,
+      weight: undefined as string | undefined,
+    }
+
+    if (record.item === 'ST') {
+      data.height = record.score.split(',')[0];
+      data.weight = record.score.split(',')[1];
     }
 
     return `data=${JSON.stringify(data)}`;

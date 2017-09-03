@@ -49,10 +49,11 @@ export default class Timmer extends React.Component<Props, State> {
   }
 
   render() {
-    const { time } = this.state;
-    const minutes = String(100 + time.getMinutes()).slice(1);
-    const seconds = String(100 + time.getSeconds()).slice(1);
-    const milliseconds = String(1000 + time.getMilliseconds()).slice(1);
-    return <span className="Timmer">{minutes}:{seconds}.{milliseconds}</span>
+    return null;
+    // const { time } = this.state;
+    // const minutes = String(100 + time.getMinutes()).slice(1);
+    // const seconds = String(100 + time.getSeconds()).slice(1);
+    // const milliseconds = String(1000 + time.getMilliseconds()).slice(1);
+    // return <span className="Timmer">{minutes}:{seconds}.{milliseconds}</span>
   }
 }

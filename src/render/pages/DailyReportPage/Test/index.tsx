@@ -3,6 +3,7 @@ import {
   TestType,
   Gender,
   TestRecord,
+  ScoreType,
   Score,
   Student,
   DeviceConfig,
@@ -114,7 +115,7 @@ export default class extends React.Component<Props, State> {
       case 'testing':
         if (props.deviceList.every(d => {
           if (!d.score) return false;
-          return d.score.final === true || d.score.data === 'error';
+          return d.score.type === ScoreType.Final || d.score.data === 'error';
         })) {
           this.endTest();
         }
@@ -194,7 +195,7 @@ export default class extends React.Component<Props, State> {
     if (left < 11 && left > 0) {
       play(`./audios/${Math.floor(left)}.mp3`);
     } else if (left <= 0) {
-      this.endTest();
+      // this.endTest();
     }
   }
 
@@ -229,11 +230,11 @@ export default class extends React.Component<Props, State> {
       TestType.PullUp
     ].includes(this.props.type)) {
       await play('./audios/prepareTest.mp3');
-      play('./audios/du.mp3');
+      // play('./audios/du.mp3');
     } else if (TestType.RopeSkipping === this.props.type) {
       await play('./audios/inPosition.mp3');
       await play('./audios/prepareTest.mp3');
-      play('./audios/du.mp3');
+      // play('./audios/du.mp3');
     } else {
       await play('./audios/begin.mp3');
     }
@@ -255,20 +256,20 @@ export default class extends React.Component<Props, State> {
   async endTest() {
     const { type, round, maxRound } = this.props;
     // 结束测试时，再获取一次成绩
-    await Promise.all(
-      this.props
-          .deviceList
-          .map(d => {
-            return actions.DRPGetScore(type, d.deviceNo).promise.originPromise;
-          }));
-    requestAnimationFrame(() => {
+    // await Promise.all(
+    //   this.props
+    //       .deviceList
+    //       .map(d => {
+    //         return actions.DRPGetScore(type, d.deviceNo).promise.originPromise;
+    //       }));
+    // requestAnimationFrame(() => {
       actions.DRPEndTest(type, maxRound);
       if (round === maxRound) {
         play('./audios/endTest.mp3').then(() => {
           play('./audios/saveRecord.mp3');
         });
       }
-    });
+    // });
   }
 
   renderDevice(device: TestDevice, index: number) {
@@ -278,7 +279,7 @@ export default class extends React.Component<Props, State> {
       const { score } = device;
       if (status === 'testing' || score) {
         return <div className="testing">
-          {score && <ScoreComponent data={score.data} type={type} final={score.final}/>}
+          {score && <ScoreComponent data={score.data} type={type} final={score.type === ScoreType.Final}/>}
           {status === 'testing' && <div className="status">测试中</div>}
         </div>;
       } else if (!student) {
