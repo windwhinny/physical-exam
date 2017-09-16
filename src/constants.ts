@@ -159,7 +159,6 @@ export interface RecordService {
     onProgress: (t: number, c: number, u: number) => void,
     onError: (record: TestRecord) => void,
     url: string,
-    deviceNo: string | null,
     type: 'bluetooth' | 'http',
   ): Promise<void>;
 }
