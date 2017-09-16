@@ -241,6 +241,17 @@ class RecordService implements RecordServiceInterface {
       milSec: number,
     }
     const getSecFromTimeStr = (str: string): Time => {
+      if (str.includes(`'`)) {
+        const match = str.match(/(\d+)'(\d+)/);
+        if (!match) throw new Error('format error');
+        const min = Number(match[1]);
+        const sec = Number(match[2]);
+        return {
+          min,
+          sec,
+          milSec: 0,
+        }
+      }
       let sec = Number(str);
       const min = Math.floor(sec / 60);
       sec = sec - min * 60;
