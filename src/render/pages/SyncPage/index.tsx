@@ -26,7 +26,8 @@ type Device = {
   address: string,
 }
 type Props = RouteComponentProps<{}>& {
-  uploadUrl: string
+  uploadUrl: string,
+  deviceNo: string | null,
 }
 
 type State = {
@@ -107,7 +108,7 @@ export class SyncPage extends React.Component<Props, State> {
       (record) => {
         faildRecords.push(record);
       },
-      address, type);
+      address, this.props.deviceNo, type);
     } catch (e) {
       updateProgress = Object.assign({}, updateProgress, {
         error: true,
@@ -298,5 +299,6 @@ export class SyncPage extends React.Component<Props, State> {
 export default connect((state: RootState) => {
   return Object.assign({}, {
     uploadUrl: state.app.uploadUrl,
+    deviceNo: state.app.deviceNo,
   });
 })(SyncPage);
