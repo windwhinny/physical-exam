@@ -6,6 +6,7 @@ import {
   WhereConditionMap,
   WhereConditionValue,
 } from '../../definitions/sql';
+import Logger from '../../services/Logger';
 import {
   isString,
   isNumber,
@@ -156,7 +157,7 @@ export function isMatchWhereCondition(data: SimpleObject, whereCon: WhereConditi
         switch (key) {
         case '$in':
           if (Array.isArray(v)) return v.includes(value);
-          console.warn(`"where.$in" does not have a Array value, got ${v} compares to ${value}`);
+          Logger.warn(`"where.$in" does not have a Array value, got ${v} compares to ${value}`);
           return true;
         }
       }

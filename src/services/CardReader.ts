@@ -9,6 +9,7 @@ import {
   CardReaderService,
 } from '../constants';
 import serviceIPCRegistor from './registor';
+import Logger from './Logger';
 
 const cmd = path.join(electron.app.getAppPath().replace(/[\\\/]resources[\\\/]app.asar/, ''), 'sdk', 'SDK.exe');
 const bookcode = 685545396225;
@@ -29,7 +30,7 @@ function fetch (pin: string) {
     socket.setTimeout(2000);
 
     socket.once('data', d => {
-      console.log(d.toString())
+      Logger.log('CardReader read', d.toString());
       const data = iconv.convert(d);
       const strs = data.toString().split('|');
       if (strs[2].includes('失败')) {
@@ -90,7 +91,7 @@ export class CardReader implements CardReaderService {
             if (onError) {
               onError({ message: e.message } as Error)
             }
-            console.error('ERROR', e.message);
+            Logger.error('CardReader', e.message);
           }).then(() => {
             if (this.looping === false) return resolve();
             setTimeout(loop, 1000);

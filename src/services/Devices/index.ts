@@ -17,6 +17,7 @@ import {
   ScoreType,
   DeviceConfig,
 } from '../../constants';
+import Logger from '../Logger';
 import serviceIPCRegistor from '../registor';
 
 export class DeviceManager extends Event.EventEmitter implements DeviceManagerService {
@@ -28,7 +29,7 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
     const p = ports.find(_p => {
       return _p.vendorId === '1A86' && _p.productId === '7523';
     });
-    if (!p) throw new Error('未找到设备');
+    if (!p) throw new Error('未找到频射设备');
     const port = new SerialPort(p.comName, {
       baudRate: 115200,
       parser: SerialPort.parsers.byteDelimiter([0x0d, 0x0a]),
@@ -157,7 +158,7 @@ class DeviceConnector extends Event.EventEmitter {
     }) as Promise<{}>;
   }
    onError(e: Error) {
-    console.error(e);
+    Logger.error('Device', e);
   }
 
   close() {

@@ -9,6 +9,8 @@ import {
   APP_SET_UPLOAD_URL,
   APP_UPDATE_TEST_ROUND,
   AppUpdateTestRoundAction,
+  APP_UPDATE_DEVICE_NO,
+  AppUpdateDeviceNoAction,
 } from '../actions/app';
 import {
   getReturnVal,
@@ -20,6 +22,7 @@ export type AppState = {
   inited: boolean,
   mode: string,
   pinCode: string | null,
+  deviceNo: string | null,
   uploadUrl: string | null,
   testRound: number,
 }
@@ -31,6 +34,7 @@ export default function(
     mode: localStorage.getItem('mode') || 'normal',
     pinCode: localStorage.getItem('pin-code') || null,
     uploadUrl: localStorage.getItem('upload-url') || null,
+    deviceNo: localStorage.getItem('device-no') || null,
     testRound: 1,
   },
   action: typeof
@@ -39,6 +43,7 @@ export default function(
     | AppUpdatePinCodeAction
     | AppSetUploadUrlAction
     | AppUpdateTestRoundAction
+    | AppUpdateDeviceNoAction
   ): AppState {
   switch (action.type) {
     case APP_INIT: {
@@ -66,6 +71,17 @@ export default function(
       localStorage.setItem('upload-url', ac.url);
       return Object.assign({}, state, {
         uploadUrl: ac.url,
+      });
+    }
+    case APP_UPDATE_DEVICE_NO: {
+      const ac = action as AppUpdateDeviceNoAction;
+      if (ac.deviceNo) {
+        localStorage.setItem('device-no', ac.deviceNo);
+      } else {
+        localStorage.removeItem('device-no');
+      }
+      return Object.assign({}, state, {
+        deviceNo: ac.deviceNo,
       });
     }
     case APP_UPDATE_PIN_CODE: {

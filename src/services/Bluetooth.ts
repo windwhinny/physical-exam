@@ -3,6 +3,7 @@ import path = require('path');
 import child_process = require('child_process');
 import serviceIPCRegistor from './registor';
 import Iconv = require('iconv');
+import Logger from './Logger';
 import {
   BluetoothService,
 } from '../constants';
@@ -20,7 +21,7 @@ export class Bluetooth implements BluetoothService {
       }, (err, buffer, stderr) => {
         if (err) return reject(err);
         if (stderr && stderr.length) {
-          console.error(stderr.toString());
+          Logger.error('ListDevices', stderr.toString());
           return reject(new Error('搜索设备出错'))
         }
         let stdout = iconv.convert(buffer).toString() as string;
@@ -71,7 +72,7 @@ export class Bluetooth implements BluetoothService {
         }
       });
       const onData = (stdout: Buffer) => {
-        console.log('onData', stdout.toString());
+        Logger.log('sync onData', stdout.toString());
         try {
           const resp = JSON.parse(stdout.toString())
           if (resp.status !== 1) {
@@ -84,11 +85,11 @@ export class Bluetooth implements BluetoothService {
         }
       };
       const onError = (e: Error | Buffer) => {
-        console.error(e);
+        Logger.error('sync', e);
         if (e instanceof Buffer) {
-          console.error(e.toString());
+          Logger.error('sync', e.toString());
         } else {
-          console.error(e);
+          Logger.error('sync', e);
         }
         reject(new Error('上传失败'));
       };

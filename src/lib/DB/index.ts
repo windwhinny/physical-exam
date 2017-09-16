@@ -2,6 +2,7 @@ import { app } from 'electron';
 import path = require('path');
 import sqlite = require('sqlite3');
 import fs = require('fs');
+import Logger from '../../services/Logger';
 import {
   SQL,
   SimpleObject,
@@ -67,7 +68,7 @@ export default class DB extends BaseDB implements DBInterface {
     await this.awaitDBTransaction(t);
     return await new Promise((resolve, reject) => {
       if (!this.db) throw new Error('db not inited');
-      console.info('RUN SQL', sql.text, sql.values);
+      Logger.info('RUN SQL', sql.text, sql.values);
       this.db.run(sql.text, sql.values, function (err) {
         if (err) return reject(err);
         // tslint:disable-next-line:no-any
@@ -81,7 +82,7 @@ export default class DB extends BaseDB implements DBInterface {
     await this.awaitDBTransaction(t);
     return await new Promise((resolve, reject) => {
       if (!this.db) throw new Error('db not inited');
-      console.info('ALL SQL', sql.text, sql.values);
+      Logger.info('ALL SQL', sql.text, sql.values);
       this.db.all(sql.text, sql.values, function (err, rows) {
         if (err) return reject(err);
         // tslint:disable-next-line:no-any

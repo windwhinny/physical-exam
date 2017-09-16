@@ -43,3 +43,11 @@ export const AppUpdateTestRound = (round: number) => ({
 });
 const UpdateTestRoundRV = getReturnVal(AppUpdateTestRound);
 export type AppUpdateTestRoundAction = typeof UpdateTestRoundRV;
+
+export const APP_UPDATE_DEVICE_NO = 'APP_UPDATE_DEVICE_NO';
+export const AppUpdateDeviceNo = (no: string | null) => ({
+  type: APP_UPDATE_DEVICE_NO,
+  deviceNo: no,
+});
+const UpdateDeviceNoRV = getReturnVal(AppUpdateDeviceNo);
+export type AppUpdateDeviceNoAction = typeof UpdateDeviceNoRV;

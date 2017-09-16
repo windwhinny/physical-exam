@@ -3,7 +3,7 @@ import {
   TestType,
   DeviceConfig,
 } from '../../constants';
-
+import Logger from '../Logger';
 export type Frame = {
   cmd: string,
   data: number[],
@@ -75,7 +75,7 @@ export function receiveFrame(buffer: Buffer): null | Frame {
       data,
     };
   } catch (e) {
-    console.log(e);
+    Logger.error('receiveFrame', e);
     return null;
   }
 }

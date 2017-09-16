@@ -24,11 +24,18 @@ require('./index.scss');
 type State = { };
 type Props = {
   inited: boolean,
+  deviceNo: string | null,
 };
 
 class App extends React.Component<Props, State> {
   componentDidMount() {
     actions.AppInit();
+
+    setInterval(() => {
+      if (this.props.deviceNo && navigator.onLine) {
+        fetch(`http://zk.sinthonic.com/sportsExam/schedule/schedule-saveFacilityMessage-save.action?param={"soleIdentifying":"${this.props.deviceNo}"}`);
+      }
+    }, 1000 * 4);
   }
 
   render() {
@@ -53,4 +60,5 @@ class App extends React.Component<Props, State> {
 }
 export default connect((state: RootState) => ({
   inited: state.app.inited,
+  deviceNo: state.app.deviceNo,
 }))(App);

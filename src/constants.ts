@@ -159,6 +159,7 @@ export interface RecordService {
     onProgress: (t: number, c: number, u: number) => void,
     onError: (record: TestRecord) => void,
     url: string,
+    deviceNo: string | null,
     type: 'bluetooth' | 'http',
   ): Promise<void>;
 }
@@ -189,4 +190,12 @@ export interface CardReaderService {
     onError?: (err: Error) => void,
   ): Promise<void>;
   stopRead(): void;
+}
+
+// tslint:disable:no-any
+export interface Logger {
+  log(message?: any, ...optionalParams: any[]): void;
+  error(message?: any, ...optionalParams: any[]): void;
+  info(message?: any, ...optionalParams: any[]): void;
+  warn(message?: any, ...optionalParams: any[]): void;
 }

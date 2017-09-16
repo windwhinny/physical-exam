@@ -1,4 +1,5 @@
 import electron = require('electron');
+import Logger from './Logger';
 const ipcMain = electron.ipcMain;
 // tslint:disable-next-line:no-any
 export default (service: any, serviceName: string) =>
@@ -7,13 +8,13 @@ export default (service: any, serviceName: string) =>
     const channel = `${serviceName}:${name}`;
     // tslint:disable-next-line:no-any
     ipcMain.on(channel, async (event: any, id: number, ...args: any[]) => {
-      console.info('RECEIVE', serviceName, name, ...args);
+      Logger.info('Registor RECEIVE', serviceName, name, ...args);
       // tslint:disable-next-line:no-any
       args = args.map(arg => {
         if (Array.isArray(arg) && arg[0] === 'IPC-CALLBACK') {
           // tslint:disable-next-line:no-any
           return (...subargs: any[]) => {
-            console.log('CALLBACK:', serviceName, name, arg[1], result);
+            Logger.log('Registor CALLBACK:', serviceName, name, arg[1], result);
             event.sender.send(`${serviceName}:${name}:callback`, id, arg[1], subargs);
           };
         }
@@ -24,7 +25,7 @@ export default (service: any, serviceName: string) =>
       try {
         result = await service[name].apply(service, args);
       } catch (e) {
-        console.error('ERROR', e);
+        Logger.error('Registor ERROR', e);
         if (e instanceof Error) {
           event.sender.send(`${serviceName}:${name}:reject`, id, {
             message: e.message,
@@ -34,7 +35,7 @@ export default (service: any, serviceName: string) =>
         }
         return;
       }
-      console.log('RESOLVE:', serviceName, name, result);
+      Logger.log('Registor RESOLVE:', serviceName, name, result);
       event.sender.send(`${serviceName}:${name}:resolve`, id, result);
     });
   });

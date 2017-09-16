@@ -1,5 +1,6 @@
 import DB from '../lib/DB';
 import request = require('request');
+import URL = require('url');
 import uuid = require('uuid');
 import {
   getStartOfDate,
@@ -20,6 +21,7 @@ import {
 } from '../constants';
 import serviceIPCRegistor from './registor';
 import BluetootService from './Bluetooth';
+import Logger from './Logger';
 
 const codeMap = {
   '50': 'wsmp',
@@ -86,7 +88,7 @@ class RecordService implements RecordServiceInterface {
           values: [],
         })
       })
-      .then(() => null, (err) => console.error(err));
+      .then(() => null, (err) => Logger.error('RecordService indexes', err));
     }, Promise.resolve());
   }
 
@@ -191,7 +193,6 @@ class RecordService implements RecordServiceInterface {
     const dateStrs = [];
     from = new Date(from);
     to = new Date(to);
-    console.log('from', from , 'to', to);
     while (from.getTime() <= to.getTime()) {
       dateStrs.push(getDateString(from));
       from = new Date(from.getTime() + oneDay);
@@ -233,7 +234,7 @@ class RecordService implements RecordServiceInterface {
     return rs.map(this.reverse);
   }
 
-  transformServerFormat(record: RecordPO) {
+  transformServerFormat(record: RecordPO, deviceNo: string) {
     type Time = {
       min: number,
       sec: number,
@@ -274,28 +275,51 @@ class RecordService implements RecordServiceInterface {
       }
     }
 
+    const getItemCode = () => {
+      switch (record.item) {
+      case '50':
+        return '0009';
+      case '8H':
+        return '0016';
+      case '1K':
+        return '0001';
+      case 'TS':
+        return '0014';
+      case 'YW':
+        return '0017';
+      case 'TY':
+        return '0012';
+      case 'YT':
+        return '0015';
+      case 'SX':
+        return '0013';
+      default:
+        return '';
+      };
+      //   [TestType.VitalCapacity]: 'FH',
+      //   [TestType.SitAndReach]: 'QQ',
+      //   [TestType.RunningBackAndForth]: '5W',
+      //   [TestType.HeightAndWeight]: 'ST',
+      // }
+    }
+
     const data = {
-      number: record.stuNo,
-      testType: codeMap[record.item as keyof typeof codeMap],
-      time: Math.round(record.testTime.getTime() / 1000),
-      score: transformRecord(),
-      height: undefined as string | undefined,
-      weight: undefined as string | undefined,
+      userName: 'zkAdmin',
+      passWord: 'pw123456',
+      soleIdentifying: deviceNo,
+      studentItemList: [{
+        itemCode: getItemCode(),
+        itemScore: transformRecord(),
+        studentCode: record.stuNo,
+      }],
     }
 
-    if (record.item === 'ST') {
-      data.height = record.score.split(',')[0];
-      data.weight = record.score.split(',')[1];
-    }
-
-    return `data=${JSON.stringify(data)}`;
+    return JSON.stringify(data);
   }
 
   isServerResponseSuccess(data: string): boolean {
-    const match = data.match(/^callback\((.*)\)$/);
-    if (!match) return false;
     try {
-      const res = JSON.parse(match[1]);
+      const res = JSON.parse(data);
       if (res.status ===  1) {
         return true;
       }
@@ -305,20 +329,24 @@ class RecordService implements RecordServiceInterface {
     return false;
   }
 
-  httpSync(url: string, data: RecordPO) {
+  httpSync(url: string, deviceNo: string, data: RecordPO) {
     return new Promise((resolve, reject) => {
-        const body = this.transformServerFormat(data);
+        const body = this.transformServerFormat(data, deviceNo);
+        const urlObj = URL.parse(url, true);
+        urlObj.query.param = body;
+        delete urlObj.search;
+        Logger.log('RecordService httpSync request body', body);
         request({
-          url,
-          headers: {
-            'Content-type': 'application/x-www-form-urlencoded',
-          },
-          method: 'POST',
-          body,
+          url: URL.format(urlObj),
+          method: 'GET',
           json: false,
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+          },
         // tslint:disable-next-line:no-any
         }, (err: Error, _: any, resBody: string) => {
           if (err) return reject(err);
+          Logger.log('RecordService httpSync response body', resBody);
           if (this.isServerResponseSuccess(resBody)) {
             resolve();
             return;
@@ -355,7 +383,7 @@ class RecordService implements RecordServiceInterface {
         studName: data.stuName,
       },
     }
-    console.log(transData);
+    Logger.log('bluetoothSync', transData);
     return BluetootService.sync(address, JSON.stringify(transData));
   }
 
@@ -363,6 +391,7 @@ class RecordService implements RecordServiceInterface {
     onProgress: (t: number, c: number, r: number) => void,
     onError: (record: TestRecord) => void,
     address: string,
+    deviceNo: string | null,
     type: 'bluetooth' | 'http',
   ): Promise<void> {
     const total = await this.model.db.all({text: 'SELECT COUNT(uuid) as count from records where synced = 0', values: []});
@@ -393,7 +422,8 @@ class RecordService implements RecordServiceInterface {
         let result: string = '';
         if (type === 'http') {
           if (!rs) break;
-          await this.httpSync(address, rs);
+          if (!deviceNo) throw new Error('no deviceNo');
+          await this.httpSync(address, deviceNo, rs);
         } else {
           if (!rs) {
             await BluetootService.sync(address, null);
@@ -407,7 +437,7 @@ class RecordService implements RecordServiceInterface {
         uploaded++;
       } catch (e) {
         onError(this.reverse(rs));
-        console.error(e);
+        Logger.error('RecordService sync', e);
       }
       proccessed++;
       // tslint:disable-next-line:no-any

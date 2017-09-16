@@ -6,7 +6,7 @@ import { destory as DevicesDestory} from './services/Devices';
 import { destory as CardReaderDestory } from './services/CardReader';
 
 const app = electron.app;
-console.log(app.getAppPath());
+
 const isDev = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
 function createWindow(url: string) {
   const display = electron.screen.getAllDisplays()[0];
