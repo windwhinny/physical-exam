@@ -59,7 +59,6 @@ export class DeviceManager extends Event.EventEmitter implements DeviceManagerSe
       _f => {
         return asciiToString(_f.data.slice(0, 3)) === device;
       });
-
     let type: ScoreType = ScoreType.Unknow;
     if (f.data[4] === 'K'.charCodeAt(0)) {
       type = ScoreType.RealTime;
@@ -194,6 +193,7 @@ class DeviceConnector extends Event.EventEmitter {
     return new Promise((resolve, reject) => {
       const cb = (_data: number[]) => {
         const f = receiveFrame(Buffer.from(_data));
+        Logger.log('DeviceConnector receive', f);
         if (!f) return;
         if (f.cmd.toLowerCase() === 'rr') {
           setTimeout(() => {
@@ -227,7 +227,7 @@ class DeviceConnector extends Event.EventEmitter {
   }
 
   send(cmd: string, data?: string | Buffer) {
-    // console.log('SEND', cmd, data);
+    Logger.log('DeviceConnector send', cmd, data);
     const f = makeFrame(cmd, data);
     this.port.write(f);
   }
