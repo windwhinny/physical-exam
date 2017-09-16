@@ -396,7 +396,7 @@ export default class extends React.Component<Props, State> {
           TestType.Running1000,
           TestType.Running800,
           TestType.Running50,
-        ].includes(type) ? <Timmer onUpdate={this.onTimmerUpdate}/> : null;
+        ].includes(type) ? <Timmer onUpdate={this.onTimmerUpdate} type={this.props.type}/> : null;
         return <button onClick={this.endTest}>结束测试 {timmer}</button>;
       } else if (status === 'pending') {
       return <button disabled>正在执行...</button>;

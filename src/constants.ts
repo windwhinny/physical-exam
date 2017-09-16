@@ -61,8 +61,8 @@ export const TestName = {
 
 export const TestUnitTemp = {
   [TestType.Running50]: '$0 秒',
-  [TestType.Running800]: '$1 秒',
-  [TestType.Running1000]: '$1 秒',
+  [TestType.Running800]: '$0 圈，$1 秒',
+  [TestType.Running1000]: '$0 圈，$1 秒',
   [TestType.RopeSkipping]: '$0 次',
   [TestType.Situps]: '$0 次',
   [TestType.StandingLongJump]: '$0 cm',
@@ -159,7 +159,6 @@ export interface RecordService {
     onProgress: (t: number, c: number, u: number) => void,
     onError: (record: TestRecord) => void,
     url: string,
-    deviceNo: string | null,
     type: 'bluetooth' | 'http',
   ): Promise<void>;
 }
