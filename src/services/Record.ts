@@ -241,35 +241,37 @@ class RecordService implements RecordServiceInterface {
       milSec: number,
     }
     const getSecFromTimeStr = (str: string): Time => {
-      const match = str.match(/(\d*)'(\d*)''(\d*)/);
-      if (!match) return {min: 0, sec: 0, milSec: 0};
-      const min = Number(match[1]);
-      const sec = Number(match[2]);
-      const milSec  = Number(match[3]);
+      let sec = Number(str);
+      const min = Math.floor(sec / 60);
+      sec = sec - min * 60;
       return {
         min,
         sec,
-        milSec,
+        milSec: 0,
       }
     }
 
     const toMin = (time: Time): string => {
-      return `${time.min}.${time.sec}`;
+      return `${time.min}.${time.sec || '00'}`;
     }
 
     const transformRecord  = () => {
       let strs: string[] = [];
       let time: Time;
       switch (record.item) {
+      case '50':
       case '1K':
       case '8H':
-        strs = record.score.split(',');
-        time = getSecFromTimeStr(strs[1]);
-        return toMin(time);
       case '5W':
-        strs = record.score.split(',');
-        time = getSecFromTimeStr(strs[2]);
-        return toMin(time);
+        if (record.score.includes(',')) {
+          strs = record.score.split(',');
+          time = getSecFromTimeStr(strs[1]);
+          return toMin(time);
+        } else {
+          return toMin(getSecFromTimeStr(record.score));
+        }
+      case 'TY':
+        return String(Number(record.score) / 100);
       default:
         return record.score;
       }
@@ -320,7 +322,7 @@ class RecordService implements RecordServiceInterface {
   isServerResponseSuccess(data: string): boolean {
     try {
       const res = JSON.parse(data);
-      if (res.status ===  1) {
+      if (res.status ===  '1') {
         return true;
       }
     } catch (e) {
