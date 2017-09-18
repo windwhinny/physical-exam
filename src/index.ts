@@ -4,7 +4,10 @@ import URL = require('url');
 import { destory as RecordDestory } from './services/Record';
 import { destory as DevicesDestory} from './services/Devices';
 import { destory as CardReaderDestory } from './services/CardReader';
-
+electron.crashReporter.start({
+  companyName: 'myCompany',
+  submitURL: '/',
+});
 const app = electron.app;
 
 const isDev = process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath);
