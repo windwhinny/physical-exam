@@ -30,6 +30,7 @@ export type Props = {
   mode: string,
   pinCode: string | null,
   maxRound: number,
+  action: string,
 } & TestState;
 
 type State = {
@@ -60,6 +61,7 @@ export default class extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    if (this.props.action === 'POP') return;
     actions.DRPClearTest();
     const {type} = this.props;
     let config: DeviceConfig | undefined;

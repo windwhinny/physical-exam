@@ -163,7 +163,7 @@ class DailyReportPage extends React.PureComponent<Props, State> {
           <li className={cx(tab === 'resultList' && 'active')} onClick={activeList('resultList')}>今日数据</li>
         </ul>
         {tab === 'testList' ?
-          <Test {...test} /> :
+          <Test {...test} action={this.props.history.action}/> :
           [renderResultList(), this.renderBottomAction()]
         }
       </div>

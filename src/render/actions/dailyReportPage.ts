@@ -67,6 +67,7 @@ export const DRPSearchDevices = (type: TestType, config?: DeviceConfig) => {
       return devices;
     }
   });
+
   return {
     type: DRP_SEARCH_DEVICES,
     promise: new ActionPromise(promise),
