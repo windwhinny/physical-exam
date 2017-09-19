@@ -360,7 +360,7 @@ class RecordService implements RecordServiceInterface {
 
   async sync(
     onProgress: (t: number, c: number, r: number) => void,
-    onError: (record: TestRecord) => void,
+    onError: (record: TestRecord, msg: string) => void,
     address: string,
     type: 'bluetooth' | 'http',
   ): Promise<void> {
@@ -405,7 +405,7 @@ class RecordService implements RecordServiceInterface {
         onError(this.reverse(rs));
         uploaded++;
       } catch (e) {
-        onError(this.reverse(rs));
+        onError(this.reverse(rs), e.message);
         Logger.error('RecordService', e);
       }
       proccessed++;
