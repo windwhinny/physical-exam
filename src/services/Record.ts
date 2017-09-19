@@ -330,16 +330,17 @@ class RecordService implements RecordServiceInterface {
     return JSON.stringify(data);
   }
 
-  isServerResponseSuccess(data: string): boolean {
+  assertServerResponse(data: string) {
     try {
       const res = JSON.parse(data);
       if (res.status ===  '1') {
         return true;
       }
+      const message = Object.values(res.result[0].errorFieldMap).join('，');
+      throw new Error(message);
     } catch (e) {
-      return false;
+      throw new Error('无法解析服务端响应');
     }
-    return false;
   }
 
   httpSync(url: string, deviceNo: string, data: RecordPO) {
@@ -360,11 +361,13 @@ class RecordService implements RecordServiceInterface {
         }, (err: Error, _: any, resBody: string) => {
           if (err) return reject(err);
           Logger.log('RecordService httpSync response body', resBody);
-          if (this.isServerResponseSuccess(resBody)) {
-            resolve();
+          try {
+            this.assertServerResponse(resBody);
+          } catch (e) {
+            reject(e);
             return;
           }
-          reject(new Error('上传失败'));
+          resolve();
           _;
         });
       });
