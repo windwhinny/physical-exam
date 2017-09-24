@@ -184,7 +184,8 @@ export default class extends React.Component<Props, State> {
       score: Score,
     }[];
     actions.DRPSaveTempScore(temp);
-    this.prepareTest();
+    await this.prepareTest();
+    this.startTest();
   }
 
   onTimmerUpdate(d: Date) {
@@ -201,9 +202,10 @@ export default class extends React.Component<Props, State> {
     }
   }
 
-  prepareTest() {
+  async prepareTest() {
     actions.DRPPrepareTest();
-    play('./audios/prepare.mp3');
+    await play('./audios/prepare.mp3');
+    this.startTest();
   }
 
   async startTest() {

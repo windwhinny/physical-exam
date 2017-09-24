@@ -55,7 +55,8 @@ export default class Timmer extends React.Component<Props, State> {
     if (![
       TestType.Running1000,
       TestType.Running800,
-      TestType.Running50
+      TestType.Running50,
+      TestType.RopeSkipping,
     ].includes(this.props.type)) {
       return null;
     }

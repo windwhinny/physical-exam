@@ -169,22 +169,20 @@ const testReducer = (
           const maxRound = ac.maxRound;
           const round = state.round < maxRound ? state.round : 0;
           let deviceList = state.deviceList;
-          if (round > 0) {
-            deviceList = state.deviceList.map(device => {
-              const temp = state.tempRecords.find(d => d.deviceNo === device.deviceNo);
-              if (!temp) return device;
-              if (!device.score) {
-                return Object.assign({}, device, {
-                  score: temp.score,
-                });
-              } else if (scoreGreatorThan(ac.testType, temp.score, device.score) > 0) {
-                return Object.assign({}, device, {
-                  score: temp.score,
-                });
-              }
-              return device;
-            });
-          }
+          deviceList = deviceList.map(device => {
+            const temp = state.tempRecords.find(d => d.deviceNo === device.deviceNo);
+            if (!temp) return device;
+            if (!device.score) {
+              return Object.assign({}, device, {
+                score: temp.score,
+              });
+            } else if (scoreGreatorThan(ac.testType, temp.score, device.score) > 0) {
+              return Object.assign({}, device, {
+                score: temp.score,
+              });
+            }
+            return device;
+          });
           return Object.assign({}, state, {
             status: 'idle',
             round,
