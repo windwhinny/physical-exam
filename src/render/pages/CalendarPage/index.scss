@@ -14,6 +14,8 @@
   >section{
     flex: 1;
     max-width: 880px;
+    display: flex;
+    flex-direction: column;
   }
   header{
     flex: 400px;

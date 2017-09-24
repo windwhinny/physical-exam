@@ -157,7 +157,7 @@ export interface RecordService {
   getByDateRange(from: Date, to: Date, type?: TestType): Promise<string[]>;
   sync(
     onProgress: (t: number, c: number, u: number) => void,
-    onError: (record: TestRecord) => void,
+    onError: (record: TestRecord, msg: string) => void,
     url: string,
     deviceNo: string | null,
     type: 'bluetooth' | 'http',

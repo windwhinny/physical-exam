@@ -254,7 +254,7 @@ class RecordService implements RecordServiceInterface {
       }
       let sec = Number(str);
       const min = Math.floor(sec / 60);
-      sec = sec - min * 60;
+      sec = Math.round(sec - min * 60);
       return {
         min,
         sec,
@@ -331,16 +331,17 @@ class RecordService implements RecordServiceInterface {
   }
 
   assertServerResponse(data: string) {
+    let message: string;
     try {
       const res = JSON.parse(data);
       if (res.status ===  '1') {
         return true;
       }
-      const message = Object.values(res.result[0].errorFieldMap).join('，');
-      throw new Error(message);
+      message = Object.values(res.result[0].errorFieldMap).join('，');
     } catch (e) {
       throw new Error('无法解析服务端响应');
     }
+    throw new Error(message);
   }
 
   httpSync(url: string, deviceNo: string, data: RecordPO) {
@@ -405,7 +406,7 @@ class RecordService implements RecordServiceInterface {
 
   async sync(
     onProgress: (t: number, c: number, r: number) => void,
-    onError: (record: TestRecord) => void,
+    onError: (record: TestRecord, msg: string) => void,
     address: string,
     deviceNo: string | null,
     type: 'bluetooth' | 'http',
@@ -449,10 +450,9 @@ class RecordService implements RecordServiceInterface {
           result = await this.bluetoothSync(address, rs, (total as any)[0].count, uploaded);
         }
         await update(rs);
-        onError(this.reverse(rs));
         uploaded++;
       } catch (e) {
-        onError(this.reverse(rs));
+        onError(this.reverse(rs), e.message);
         Logger.error('RecordService sync', e);
       }
       proccessed++;

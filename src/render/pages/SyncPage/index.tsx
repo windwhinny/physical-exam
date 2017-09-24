@@ -31,7 +31,10 @@ type Props = RouteComponentProps<{}>& {
 }
 
 type State = {
-  faildRecords: TestRecord[],
+  faildRecords: {
+    record: TestRecord,
+    message: string,
+  }[],
   devices: Device[],
   selectedType: 'http' | 'bluetooth',
   uploadUrl: string | null,
@@ -94,7 +97,10 @@ export class SyncPage extends React.Component<Props, State> {
       error: false,
     });
     this.setState({ updateProgress });
-    const faildRecords: TestRecord[] = [];
+    const faildRecords: {
+      record: TestRecord,
+      message: string,
+    }[] = [];
     try {
       await RecordService('sync')((t, p, u) => {
         updateProgress = Object.assign({}, updateProgress, {
@@ -105,8 +111,11 @@ export class SyncPage extends React.Component<Props, State> {
         processed = p;
         uploaded = u;
       },
-      (record) => {
-        faildRecords.push(record);
+      (record, message) => {
+        faildRecords.push({
+          record,
+          message,
+        });
       },
       address, this.props.deviceNo, type);
     } catch (e) {
@@ -249,16 +258,19 @@ export class SyncPage extends React.Component<Props, State> {
               <td>学号</td>
               <td>成绩</td>
               <td>测试时间</td>
+              <td>失败原因</td>
             </tr>
           </thead>
           <tbody>
-            {faildRecords.map((r, i) => {
+            {faildRecords.map((faild, i) => {
+              const r = faild.record;
               return <tr key={i}>
                 <td>{TestName[r.test.type]}</td>
                 <td>{r.student.name}</td>
                 <td>{r.student.nu}</td>
                 <td><Score data={r.test.score} type={r.test.type}/></td>
                 <td>{getDateString(r.date)}</td>
+                <td>{faild.message}</td>
               </tr>
             })}
           </tbody>
