@@ -1,6 +1,6 @@
 import electron = require('electron');
 let increamId = 0;
-const ipcRenderer = electron.ipcRenderer;
+const ipcRenderer: Electron.IpcRenderer | null = typeof electron !== 'undefined' ? electron.ipcRenderer : null;
 
 export default (serviceName: string) => (name: string) => {
   let id = increamId++;
@@ -12,6 +12,7 @@ export default (serviceName: string) => (name: string) => {
       console.time(label);
       const clear = () => {
         console.timeEnd(label);
+        if (!ipcRenderer) return;
         ipcRenderer.removeListener(`${serviceName}:${name}:resolve`, onResolve);
         ipcRenderer.removeListener(`${serviceName}:${name}:reject`, onReject);
         ipcRenderer.removeListener(`${serviceName}:${name}:callback`, onCallback);
@@ -47,6 +48,7 @@ export default (serviceName: string) => (name: string) => {
         const index = callbacks.push(arg) - 1;
         return ['IPC-CALLBACK', index];
       });
+      if (!ipcRenderer) return;
       console.info('SEND', name, ...args);
       ipcRenderer.send(`${serviceName}:${name}`, id, ...args);
       ipcRenderer.on(`${serviceName}:${name}:resolve`, onResolve);

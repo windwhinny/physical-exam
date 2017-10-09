@@ -402,7 +402,6 @@ class RecordService implements RecordServiceInterface {
           result = await this.bluetoothSync(address, rs, (total as any)[0].count, uploaded);
         }
         await update(rs);
-        onError(this.reverse(rs));
         uploaded++;
       } catch (e) {
         onError(this.reverse(rs), e.message);

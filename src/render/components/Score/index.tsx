@@ -36,10 +36,22 @@ export default class Score extends React.Component<Props, void> {
   }
 
   getScoreDesc(): string {
-    const { data, type } = this.props;
+    const { data, type, final } = this.props;
     if (this.isError) return '犯规';
-    const temp = TestUnitTemp[type];
+    let temp = TestUnitTemp[type];
     if (!temp) return data;
+    if (final === false) {
+      if (type === TestType.Running50) {
+        return '测试中';
+      }
+      if ([
+        TestType.Running1000,
+        TestType.Running800,
+        TestType.RunningBackAndForth,
+      ].includes(type)) {
+        temp = '$0 圈';
+      }
+    }
     return data.split(',').reduce((str, v, i) => {
       return str.replace('$' + i, v);
     }, temp);

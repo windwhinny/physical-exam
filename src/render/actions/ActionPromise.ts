@@ -15,4 +15,10 @@ export default class ActionPromsie <T> {
       this.error = err;
     });
   }
+
+  await() {
+    return this.originPromise.then(() => {
+      return this;
+    });
+  }
 }

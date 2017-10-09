@@ -8,7 +8,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "target": "es2017",
+    "target": "es5",
     "jsx": "react",
     "lib": [
       "dom.iterable",

@@ -88,7 +88,11 @@ type RouteAction = {
   }
 }
 
-const testReducer = (
+type InitAction = {
+  type: '@@redux/INIT',
+}
+
+export const testReducer = (
   state: TestState = defaultTestState,
   action:
     DRPSearchDevicesAction |
@@ -99,7 +103,8 @@ const testReducer = (
     DRPEndTestAction |
     DRPGetScoreAction |
     DRPSaveTestResultAction |
-    DRPSaveTempScoreAction
+    DRPSaveTempScoreAction |
+    InitAction
 ) => {
   switch (action.type) {
     case DRP_CLEAR_TEST: {
@@ -186,7 +191,10 @@ const testReducer = (
           return Object.assign({}, state, {
             status: 'idle',
             round,
-            tempRecords: round === 0 ? [] : state.tempRecords,
+            tempRecords: round !== 0 ? deviceList.map(device => ({
+              deviceNo: device.deviceNo,
+              score: device.score,
+            })) : [],
             deviceList,
           });
         case 'rejected':
